@@ -1,0 +1,11 @@
+<div class="py-8 flex justify-center items-center">
+  <button
+    type="{{ buttonType }}"
+    class="btn {{ buttonType }} w-{{ width }}"
+    [class.disabled]="isDisabled"
+    [class.autoWidth]="width === 'auto'"
+    (click)="onBtnClicked($event)"
+  >
+    {{ buttonTitle }}
+  </button>
+</div>
