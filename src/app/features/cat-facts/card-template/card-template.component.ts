@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
+import { AudioService } from '../../settings/services/audio.service';
 
 @Component({
   selector: 'app-card-template',
@@ -9,19 +10,37 @@ import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/c
 export class CardTemplateComponent implements OnDestroy {
   @Input() fact: string;
 
+  constructor(private audioService: AudioService) {}
+
   ngOnDestroy() {
     window.speechSynthesis.cancel();
   }
 
   readText(fact: string): void {
-    window.speechSynthesis.cancel();
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(fact);
-      utterance.voice = speechSynthesis.getVoices().filter((voice) => voice.lang === 'en')[0];
-      utterance.pitch = 1;
-      utterance.rate = 1;
-      utterance.volume = 1;
-      window.speechSynthesis.speak(utterance);
+    const synth = window.speechSynthesis;
+    const trySpeak = () => {
+      const voices = synth.getVoices();
+      if (voices.length > 0) {
+        synth.cancel();
+        const utterance = new SpeechSynthesisUtterance(fact);
+        utterance.voice = voices.find((voice) => voice.lang.startsWith('en')) as SpeechSynthesisVoice; // Adjusted to find the first English voice
+        utterance.pitch = 1;
+        utterance.rate = 1;
+        utterance.volume = 1;
+
+        this.audioService.decreaseVolume();
+
+        utterance.onend = () => {
+          this.audioService.increaseVolume();
+        };
+
+        synth.speak(utterance);
+      }
+    };
+    if (synth.getVoices().length === 0) {
+      synth.onvoiceschanged = trySpeak;
+    } else {
+      trySpeak();
     }
   }
 }

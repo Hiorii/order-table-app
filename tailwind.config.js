@@ -4,6 +4,7 @@ export const THEME_COLORS = {
   primaryLight: '#FEF4DE',
   secondary: '#5E5556',
   secondaryDark: '#3d3939',
+  theme: '#132E30',
   warning: '#990000',
   white: '#FFFFFF',
   'neutral-0': '#FFFFFF',

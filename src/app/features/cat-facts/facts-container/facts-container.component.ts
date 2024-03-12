@@ -1,9 +1,9 @@
 import { Component, ElementRef, HostListener, Inject, OnInit, ViewChild } from '@angular/core';
-import { SessionService } from '../../../shared/services/session.service';
 import { Router } from '@angular/router';
-import { filter, Observable, of, scan, startWith, Subject, switchMap, tap } from 'rxjs';
+import { catchError, filter, Observable, of, scan, startWith, Subject, switchMap, tap } from 'rxjs';
 import { CatFactsService } from '../services/cat-facts.service';
 import { DOCUMENT } from '@angular/common';
+import { AuthenticationService } from '../../authentication/services/authentication.service';
 
 @Component({
   selector: 'app-facts-container',
@@ -29,9 +29,9 @@ export class FactsContainerComponent implements OnInit {
   public facts$: Observable<string[]>;
 
   constructor(
-    private sessionService: SessionService,
     public router: Router,
     private catFactService: CatFactsService,
+    private authenticationService: AuthenticationService,
     @Inject(DOCUMENT) private document: Document
   ) {}
 
@@ -46,7 +46,12 @@ export class FactsContainerComponent implements OnInit {
       switchMap(() => {
         if (!this.loadingMoreFacts) {
           this.loadingMoreFacts = true;
-          return this.catFactService.fetchFacts('https://meowfacts.herokuapp.com', 5);
+          return this.catFactService.fetchFacts('https://meowfacts.herokuapp.com', 5).pipe(
+            catchError((error) => {
+              console.error('Error fetching facts', error);
+              return of(null);
+            })
+          );
         } else {
           return of(null);
         }
@@ -61,11 +66,19 @@ export class FactsContainerComponent implements OnInit {
   }
 
   logout() {
-    this.sessionService.remove('currentUser');
-    this.router.navigate(['/authentication/login']);
+    this.authenticationService.logout();
   }
 
   loadMoreFacts() {
     this.loadMoreTrigger.next();
+  }
+
+  navigateUp(): void {
+    if (this.cardsContainer && this.cardsContainer.nativeElement) {
+      this.cardsContainer.nativeElement.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   }
 }
