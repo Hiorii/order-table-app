@@ -75,6 +75,14 @@
         "sourceType": "module",
         "ecmaVersion": 2020
       }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "rules": {
+        "@angular-eslint/template/label-has-associated-control": "off"
+      }
     }
   ]
 }

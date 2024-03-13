@@ -3,7 +3,9 @@
 @import 'tailwindcss/utilities';
 @import 'assets/styles/settings';
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 

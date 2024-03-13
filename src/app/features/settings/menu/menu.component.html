@@ -3,10 +3,16 @@
     <div class="fixed top-[3%] right-[3%]">
       <i
         class="fas fa-sign-out text-theme text-xl cursor-pointer hover:scale-105 mr-16"
-        (click)="logout()"></i>
+        tabindex="0"
+        (click)="logout()"
+        (keyup.enter)="logout()"
+      ></i>
       <i
         class="fas fa-cat text-theme text-xl cursor-pointer hover:scale-105"
-        (click)="router.navigate(['/'])"></i>
+        tabindex="0"
+        (click)="router.navigate(['/'])"
+        (keyup.enter)="router.navigate(['/'])"
+      ></i>
     </div>
     <div class="p-12 mt-40">
       <h1 class="text-theme text-2xl font-bold text-center mt-16">Settings</h1>
@@ -14,15 +20,26 @@
         <div class="w-full flex justify-around items-center pt-32">
           <p class="text-2xl font-bold text-secondary">Sound:</p>
           <div class="flex justify-center items-center text-theme text-2xl-bold">
-            <span class="pr-12 cursor-pointer hover:scale-105" [class.underline]="isMusicOn"
-                  (click)="toggleMusic(true)">On</span>
+            <span
+              class="pr-12 cursor-pointer hover:scale-105"
+              [class.underline]="isMusicOn"
+              tabindex="0"
+              (click)="toggleMusic(true)"
+              (keyup.enter)="toggleMusic(true)"
+              >On</span
+            >
             <span>/</span>
-            <span class="pl-12 text-warning cursor-pointer hover:scale-105" [class.underline]="!isMusicOn"
-                  (click)="toggleMusic(false)">Off</span>
+            <span
+              class="pl-12 text-warning cursor-pointer hover:scale-105"
+              [class.underline]="!isMusicOn"
+              tabindex="0"
+              (click)="toggleMusic(false)"
+              (keyup.enter)="toggleMusic(false)"
+              >Off</span
+            >
           </div>
         </div>
       </form>
     </div>
   </div>
 </div>
-

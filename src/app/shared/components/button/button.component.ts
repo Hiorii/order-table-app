@@ -10,9 +10,9 @@ export class ButtonComponent {
   @Input({ required: true }) buttonTitle: string = 'click';
   @Input() isDisabled: boolean = false;
   @Input() width: string = 'full';
-  @Output() onBtnClick: EventEmitter<MouseEvent> = new EventEmitter();
+  @Output() btnClick: EventEmitter<MouseEvent> = new EventEmitter();
 
   onBtnClicked(event: MouseEvent) {
-    this.onBtnClick.emit(event);
+    this.btnClick.emit(event);
   }
 }

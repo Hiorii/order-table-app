@@ -12,10 +12,6 @@ export class NgControlStub {
   get valueChanges() {
     return this.control.valueChanges;
   }
-
-  reset(value?: any) {
-    this.control.setValue(value);
-  }
 }
 
 export const NG_CONTROL_PROVIDER = {

@@ -4,13 +4,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 @Component({
   template: `
-    <div style="height: 100px;" appOverflowCheck (overflowChange)="onOverflowChange($event)">
+    <div style="height: 100px;" appOverflowCheck (overflowChange)="onOverflowChange()">
       <p style="height: 150px;">Child</p>
     </div>
   `
 })
 class TestComponent {
-  onOverflowChange(overflow: boolean) {}
+  onOverflowChange() {}
 }
 
 describe('OverflowCheckDirective', () => {
@@ -41,5 +41,3 @@ describe('OverflowCheckDirective', () => {
     }, 0);
   });
 });
-
-
