@@ -32,11 +32,11 @@ describe('ButtonComponent', () => {
   });
 
   it('should emit onBtnClick event on button click', () => {
-    jest.spyOn(component.onBtnClick, 'emit');
+    jest.spyOn(component.btnClick, 'emit');
 
     const button = fixture.debugElement.query(By.css('button'));
     button.triggerEventHandler('click', null);
 
-    expect(component.onBtnClick.emit).toHaveBeenCalled();
+    expect(component.btnClick.emit).toHaveBeenCalled();
   });
 });
