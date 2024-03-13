@@ -9,11 +9,12 @@ import { AudioService } from '../../settings/services/audio.service';
 })
 export class CardTemplateComponent implements OnDestroy {
   @Input() fact: string;
+  public isOverflowing: boolean = false;
 
   constructor(private audioService: AudioService) {}
 
   ngOnDestroy() {
-    window.speechSynthesis.cancel();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
   }
 
   readText(fact: string): void {
@@ -23,7 +24,7 @@ export class CardTemplateComponent implements OnDestroy {
       if (voices.length > 0) {
         synth.cancel();
         const utterance = new SpeechSynthesisUtterance(fact);
-        utterance.voice = voices.find((voice) => voice.lang.startsWith('en')) as SpeechSynthesisVoice; // Adjusted to find the first English voice
+        utterance.voice = voices.find((voice) => voice.lang.startsWith('en')) as SpeechSynthesisVoice;
         utterance.pitch = 1;
         utterance.rate = 1;
         utterance.volume = 1;

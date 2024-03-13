@@ -3,12 +3,28 @@
 @import 'tailwindcss/utilities';
 @import 'assets/styles/settings';
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html {
   font-size: $font-size;
   height: 100%;
   width: 100%;
   @media all and (max-height: 1080px) {
     font-size: 14px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $secondary-color;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $primaryLight;
   }
 }
 
