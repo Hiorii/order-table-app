@@ -1,27 +1,46 @@
-# CatFacts
+# Cat facts
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.2.0.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.2.0
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Run `npm run start` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
+### Run tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+1. Run the application `npm run start`.
+2. Run Cypress `npm run test` to start unit test in Jest.
+
+### Create tests
+
+Create new file with extension `.spec.ts` in the folder when tested component or service is located.
+
+### Documentation
+
+Documentation: https://jestjs.io/docs/getting-started.
+
+Examples: https://www.xfive.co/blog/testing-angular-faster-jest/
 
 ## Running end-to-end tests
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Run tests
 
-## Further help
+1. Run the application `npm run start`.
+2. Run Cypress `npm run cypress`.
+3. Use the Cypress application to start a browser session of your choice.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Create tests
+
+Create new E2E tests in the folder `./cypress/e2e/`.
+
+If Cypress is running, tests will be rerun when any changes are applied to tests.
+
+### Documentation
+
+Documentation: https://docs.cypress.io/.
+
+Examples: https://docs.cypress.io/examples/recipes/

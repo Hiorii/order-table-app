@@ -10,7 +10,8 @@
     "test:watch": "jest --watch",
     "format": "prettier ./**/*.{ts,html,scss} --write",
     "format:check": "prettier ./**/*.{ts,html,scss} --check",
-    "lint": "eslint ./**/*.{ts,html,scss} --fix"
+    "lint": "eslint ./**/*.{ts,html,scss} --fix",
+    "cypress": "npx cypress open"
   },
   "private": true,
   "dependencies": {
@@ -39,6 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "autoprefixer": "^10.4.18",
+    "cypress": "^13.6.6",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
