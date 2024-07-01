@@ -1,9 +1,0 @@
-.backgroundImage {
-  @apply relative bg-center bg-no-repeat bg-cover z-0;
-
-  &::before {
-    content: '';
-    @apply absolute inset-0 bg-center bg-no-repeat bg-cover opacity-30 -z-10 rounded-lg;
-    background-image: url('/assets/images/cat-facts/card-top.png');
-  }
-}
