@@ -10,7 +10,6 @@
 }
 
 html {
-  font-size: $font-size;
   height: 100%;
   width: 100%;
   @media all and (max-height: 1080px) {
@@ -20,17 +19,8 @@ html {
   ::-webkit-scrollbar {
     width: 12px;
   }
-
-  ::-webkit-scrollbar-track {
-    background: $secondary-color;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: $primaryLight;
-  }
 }
 
 body {
-  @apply w-full h-full m-0 p-0 bg-primary text-white font-sans relative overflow-x-hidden;
-  font-family: $primary-font;
+  @apply w-full h-full m-0 p-0 font-sans relative overflow-x-hidden;
 }
