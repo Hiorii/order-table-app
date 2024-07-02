@@ -65,13 +65,20 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
       },
       {} as Record<OrderSymbol, OrderModel[]>
     );
-    this.orderGroups = Object.entries(groups).map(([symbol, orders]) => ({
-      symbol: symbol as OrderSymbol,
-      size: orders.reduce((acc, order) => acc + order.size, 0),
-      openPrice: orders.reduce((acc, order) => acc + order.openPrice, 0),
-      swap: orders.reduce((acc, order) => acc + order.swap, 0),
-      profit: 12,
-      children: groups[symbol as OrderSymbol]
-    }));
+    this.orderGroups = Object.entries(groups).map(([symbol, orders]) => {
+      const totalSize = orders.reduce((acc, order) => acc + order.size, 0);
+      const avgOpenPrice = orders.reduce((acc, order) => acc + order.openPrice, 0) / orders.length;
+      const avgProfit = orders.reduce((acc, order) => acc + order.profit, 0) / orders.length;
+      const totalSwap = orders.reduce((acc, order) => acc + order.swap, 0);
+
+      return {
+        symbol: symbol as OrderSymbol,
+        size: totalSize,
+        openPrice: avgOpenPrice,
+        swap: totalSwap,
+        profit: 12.2131,
+        children: orders
+      } as OrderGroup;
+    });
   }
 }

@@ -6,8 +6,8 @@ export interface OrderModel extends BaseTableData {
   openPrice: number;
   swap: number;
   closePrice: number;
-  id: number;
   symbol: OrderSymbol;
   side: string;
   size: number;
+  profit: number;
 }
