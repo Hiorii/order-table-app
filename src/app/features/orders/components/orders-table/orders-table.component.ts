@@ -6,6 +6,8 @@ import { OrdersState } from '../../store/orders.state';
 import { OrderModel } from '../../../../core/models/order.model';
 import { GetOrdersData } from '../../store/orders.actions';
 import { OrderGroup } from '../../models/order-group.model';
+import { OrderSymbol } from '../../enums/order-symbol.enum';
+import { TableHeader } from '../../../../shared/components/table/models/table-header.model';
 
 @Component({
   selector: 'app-orders-table',
@@ -16,7 +18,17 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
   ordersData$: Observable<OrderModel[] | null> = inject(Store).select(OrdersState.ordersData);
   ordersData: OrderModel[] | null = [];
   orderGroups: OrderGroup[] = [];
-  expandedGroup: string | null = null;
+  headers: TableHeader[] = [
+    { id: 'symbol', name: 'Symbol' },
+    { id: 'id', name: 'Order ID' },
+    { id: 'side', name: 'Side' },
+    { id: 'size', name: 'Size' },
+    { id: 'openTime', name: 'Open Time' },
+    { id: 'openPrice', name: 'Open Price' },
+    { id: 'swap', name: 'Swap' },
+    { id: 'profit', name: 'Profit' }
+  ];
+  expandedGroups: Set<string> = new Set<string>();
 
   constructor(private store: Store) {
     super();
@@ -41,19 +53,23 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
     }
 
     const groups = this.ordersData?.reduce(
-      (acc: Record<string, OrderModel[]>, order) => {
+      (acc: Record<OrderSymbol, OrderModel[]>, order) => {
         if (!acc[order.symbol]) {
           acc[order.symbol] = [];
         }
         acc[order.symbol].push(order);
         return acc;
       },
-      {} as Record<string, OrderModel[]>
+      {} as Record<OrderSymbol, OrderModel[]>
     );
 
     this.orderGroups = Object.keys(groups).map((symbol) => ({
-      symbol,
-      orders: groups[symbol]
+      symbol: symbol as OrderSymbol,
+      size: 12,
+      openPrice: 12,
+      swap: 12,
+      profit: 12,
+      children: groups[symbol as OrderSymbol]
     }));
   }
 }

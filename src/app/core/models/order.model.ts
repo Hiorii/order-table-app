@@ -1,10 +1,13 @@
-export interface OrderModel {
+import { OrderSymbol } from '../../features/orders/enums/order-symbol.enum';
+import { BaseTableData } from '../../shared/components/table/models/base-table-data.model';
+
+export interface OrderModel extends BaseTableData {
   openTime: number;
   openPrice: number;
   swap: number;
   closePrice: number;
   id: number;
-  symbol: string;
+  symbol: OrderSymbol;
   side: string;
   size: number;
 }
