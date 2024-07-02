@@ -8,6 +8,7 @@ import { GetOrdersData } from '../../store/orders.actions';
 import { OrderGroup } from '../../models/order-group.model';
 import { OrderSymbol } from '../../enums/order-symbol.enum';
 import { TableHeader } from '../../../../shared/components/table/models/table-header.model';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-orders-table',
@@ -28,7 +29,6 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
     { id: 'swap', name: 'Swap' },
     { id: 'profit', name: 'Profit' }
   ];
-  expandedGroups: Set<string> = new Set<string>();
 
   constructor(private store: Store) {
     super();
@@ -41,7 +41,10 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
 
   listenToOrdersDataChanges(): void {
     this.ordersData$.pipe(filter(Boolean), takeUntil(this.destroyed$)).subscribe((data) => {
-      this.ordersData = data;
+      this.ordersData = data.map((order) => ({
+        ...order,
+        openTime: format(new Date(order.openTime), 'dd.MM.yyyy HH:mm:ss')
+      }));
       this.groupOrders();
     });
   }
@@ -62,12 +65,11 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
       },
       {} as Record<OrderSymbol, OrderModel[]>
     );
-
-    this.orderGroups = Object.keys(groups).map((symbol) => ({
+    this.orderGroups = Object.entries(groups).map(([symbol, orders]) => ({
       symbol: symbol as OrderSymbol,
-      size: 12,
-      openPrice: 12,
-      swap: 12,
+      size: orders.reduce((acc, order) => acc + order.size, 0),
+      openPrice: orders.reduce((acc, order) => acc + order.openPrice, 0),
+      swap: orders.reduce((acc, order) => acc + order.swap, 0),
       profit: 12,
       children: groups[symbol as OrderSymbol]
     }));

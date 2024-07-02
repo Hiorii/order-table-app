@@ -1,24 +1,27 @@
 <table>
   <thead class="h-12 bg-dark-background text-dark-text">
   <tr>
-    <th *ngFor="let header of headers" class="w-auto min-w-32">{{ header.name }}</th>
+    <th *ngFor="let header of headers" class="w-auto truncate px-8">
+      {{ header.name }}
+    </th>
   </tr>
   </thead>
   <tbody class="bg-dark-row text-dark-text">
-  <ng-container *ngFor="let group of data; trackBy: trackByFn">
-    <tr (click)="toggleGroup(group.symbol)">
-      <td class="flex justify-center items-center h-12">
+  <ng-container *ngFor="let group of _data; trackBy: trackByFn">
+    <tr (click)="toggleGroup(group.symbol)" class="cursor-pointer hover:bg-dark-hover">
+      <td class="flex justify-center items-center h-12 truncate">
+        <app-icon *ngIf="group.arrowIcon" [name]="group.arrowIcon" class="text-blue-400 text-xs pl-1 pr-4"></app-icon>
         <span class="w-20">{{ group.symbol }}</span>
-        <span class="flex justify-center items-center bg-black w-8 h-8 rounded-full">{{ group.children.length }}</span>
+        <span class="flex justify-center items-center bg-black w-7 h-7 rounded-full">{{ group.children.length }}</span>
       </td>
-      <td *ngFor="let header of headers.slice(1)" class="w-full text-center">
+      <td *ngFor="let header of headers.slice(1)" class="w-full text-center font-bold truncate">
         {{ getDisplayValue(group, header.id) }}
       </td>
     </tr>
     <ng-container *ngIf="expandedGroups.has(group.symbol)">
       <tr *ngFor="let item of group.children">
         <td></td>
-        <td *ngFor="let header of headers.slice(1)">
+        <td *ngFor="let header of headers.slice(1)" class="text-center h-12 truncate">
           {{ getDisplayValue(item, header.id) }}
         </td>
       </tr>
