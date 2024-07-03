@@ -8,6 +8,7 @@ import { CoreModule } from './core/core.module';
 import { NgxsModule } from '@ngxs/store';
 import { environment } from '../environments/environment';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
     NgxsModule.forRoot([], {
       developmentMode: !environment.production
     }),
-    NgxsReduxDevtoolsPluginModule.forRoot()
+    NgxsReduxDevtoolsPluginModule.forRoot(),
+    SharedModule
   ],
   declarations: [AppComponent],
   bootstrap: [AppComponent]

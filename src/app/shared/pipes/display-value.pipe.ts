@@ -1,15 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { format } from 'date-fns';
 import { BaseTableData } from '../components/table/models/base-table-data.model';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-
-type DisplayValueReturnType = string | number | Date | boolean | undefined | IconDefinition | null;
+import { BaseValueType } from '../../core/models/base-value.type';
 
 @Pipe({
   name: 'displayValue'
 })
 export class DisplayValuePipe implements PipeTransform {
-  transform(value: BaseTableData[keyof BaseTableData], key: keyof BaseTableData): DisplayValueReturnType {
+  transform(value: BaseTableData[keyof BaseTableData], key: keyof BaseTableData): BaseValueType {
     if (key === 'openTime' && value) {
       return format(new Date(value as number), 'dd.MM.yyyy HH:mm:ss');
     }

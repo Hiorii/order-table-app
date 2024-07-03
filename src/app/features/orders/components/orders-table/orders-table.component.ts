@@ -8,6 +8,9 @@ import { GetOrdersData } from '../../store/orders.actions';
 import { OrderGroup } from '../../models/order-group.model';
 import { OrderSymbol } from '../../enums/order-symbol.enum';
 import { TableHeader } from '../../../../shared/components/table/models/table-header.model';
+import { faTrash, faX } from '@fortawesome/free-solid-svg-icons';
+import { BaseTableData } from '../../../../shared/components/table/models/base-table-data.model';
+import { ToastService } from '../../../../shared/components/toast/services/toast.service';
 
 @Component({
   selector: 'app-orders-table',
@@ -27,10 +30,31 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
     { id: 'openPrice', name: 'Open Price' },
     { id: 'swap', name: 'Swap' },
     { id: 'profit', name: 'Profit' },
-    { id: 'remove', name: '', isAction: true }
+    {
+      id: 'actions',
+      name: '',
+      isAction: true,
+      mainActions: [
+        {
+          icon: faTrash,
+          name: 'removeGroup',
+          click: (group: BaseTableData, event) => this.removeGroup(group, event)
+        }
+      ],
+      childActions: [
+        {
+          icon: faX,
+          name: 'removeItem',
+          click: (item: BaseTableData, event) => this.removeItem(item, event)
+        }
+      ]
+    }
   ];
 
-  constructor(private store: Store) {
+  constructor(
+    private store: Store,
+    private toastService: ToastService
+  ) {
     super();
   }
 
@@ -87,5 +111,26 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
 
   calculateAverageProfit(orders: OrderModel[]): number {
     return orders.reduce((acc, order) => acc + order.profit, 0) / orders.length;
+  }
+
+  removeItem(item: BaseTableData, event?: Event): void {
+    event?.stopPropagation();
+    const group = this.orderGroups.find((group) => group.symbol === item['symbol']);
+    if (!group) return;
+
+    group.children = group.children.filter((child) => child['id'] !== item.id);
+    if (group.children.length === 0) {
+      this.orderGroups = this.orderGroups.filter((group) => group.symbol !== item['symbol']);
+    }
+    this.toastService.showSuccess('Zamknięto zlecenie', `Zamknięto zlecenie nr ${item.id}`);
+  }
+
+  removeGroup(group: BaseTableData, event?: Event): void {
+    event?.stopPropagation();
+    const groupData = this.orderGroups.find((g) => g.symbol === group['symbol']);
+    if (!groupData) return;
+    const groupsIds = groupData.children.map((child) => child['id']);
+    this.orderGroups = this.orderGroups.filter((g) => g.symbol !== group['symbol']);
+    this.toastService.showSuccess('Zamknięto grupę', `Zamknięto zlecenia nr ${groupsIds.join(', ')}`);
   }
 }

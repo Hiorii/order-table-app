@@ -1,7 +1,7 @@
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { BaseValueType } from '../../../../core/models/base-value.type';
 
 export interface BaseTableData {
-  id: number;
+  id?: number;
 
-  [key: string]: string | number | boolean | Date | IconDefinition | null | undefined;
+  [key: string]: BaseValueType;
 }

@@ -18,9 +18,11 @@
         <ng-container *ngIf="!header.isAction">
           {{ group[header.id] | displayValue:header.id }}
         </ng-container>
-        <ng-container *ngIf="header.isAction">
-          <app-icon (click)="removeGroup(group.symbol, $event)" [name]="removeGroupIcon"
-                    class="text-blue-400 hover:text-blue-500"></app-icon>
+        <ng-container *ngIf="header.isAction && header.mainActions">
+          <ng-container *ngFor="let action of header.mainActions">
+            <app-icon (click)="action.click(group, $event)" [name]="action.icon"
+                      class="text-blue-400 hover:text-blue-500"></app-icon>
+          </ng-container>
         </ng-container>
       </td>
     </tr>
@@ -31,9 +33,11 @@
           <ng-container *ngIf="!header.isAction">
             {{ item[header.id] | displayValue:header.id }}
           </ng-container>
-          <ng-container *ngIf="header.isAction">
-            <app-icon (click)="removeItem(group.symbol ,item['id'], $event)" [name]="removeItemIcon"
-                      class="text-blue-400 cursor-pointer hover:text-blue-500"></app-icon>
+          <ng-container *ngIf="header.isAction && header.childActions">
+            <ng-container *ngFor="let action of header.childActions">
+              <app-icon (click)="action.click(item, $event)" [name]="action.icon"
+                        class="text-blue-400 cursor-pointer hover:text-blue-500"></app-icon>
+            </ng-container>
           </ng-container>
         </td>
       </tr>
