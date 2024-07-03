@@ -1,3 +1,8 @@
 <div class="h-full w-full flex items-center justify-center">
-  <app-table [headers]="headers" [data]="orderGroups"></app-table>
+  <app-table *ngIf="orderGroups?.length" [headers]="headers" [data]="orderGroups"></app-table>
+  <div *ngIf="!orderGroups?.length" class="flex flex-col justify-center items-center">
+    <app-empty [title]="emptyData.title" [details]="emptyData.details"
+               [icon]="emptyData.icon" class="mb-8"></app-empty>
+    <app-button [text]="buttonData.text" [icon]="buttonData.icon" (clickBtn)="getOrdersData()"></app-button>
+  </div>
 </div>

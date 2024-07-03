@@ -8,10 +8,12 @@ import { GetOrdersData } from '../../store/orders.actions';
 import { OrderGroup } from '../../models/order-group.model';
 import { OrderSymbol } from '../../enums/order-symbol.enum';
 import { TableHeader } from '../../../../shared/components/table/models/table-header.model';
-import { faTrash, faX } from '@fortawesome/free-solid-svg-icons';
+import { faCloudArrowDown, faFaceSurprise, faTrash, faX } from '@fortawesome/free-solid-svg-icons';
 import { BaseTableData } from '../../../../shared/components/table/models/base-table-data.model';
 import { ToastService } from '../../../../shared/components/toast/services/toast.service';
 import { ConfirmModalService } from '../../../../shared/components/confirm-modal/services/confirm-modal.service';
+import { EmptyOrderModel } from '../../../../shared/components/empty/models/empty-order.model';
+import { ButtonModel } from '../../../../shared/components/button/models/button.model';
 
 @Component({
   selector: 'app-orders-table',
@@ -22,35 +24,9 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
   ordersData$: Observable<OrderModel[] | null> = inject(Store).select(OrdersState.ordersData);
   ordersData: OrderModel[] | null = [];
   orderGroups: OrderGroup[] = [];
-  headers: TableHeader[] = [
-    { id: 'symbol', name: 'Symbol' },
-    { id: 'id', name: 'Order ID' },
-    { id: 'side', name: 'Side' },
-    { id: 'size', name: 'Size' },
-    { id: 'openTime', name: 'Open Time' },
-    { id: 'openPrice', name: 'Open Price' },
-    { id: 'swap', name: 'Swap' },
-    { id: 'profit', name: 'Profit' },
-    {
-      id: 'actions',
-      name: '',
-      isAction: true,
-      mainActions: [
-        {
-          icon: faTrash,
-          name: 'removeGroup',
-          click: (group: BaseTableData, event) => this.removeGroup(group, event)
-        }
-      ],
-      childActions: [
-        {
-          icon: faX,
-          name: 'removeItem',
-          click: (item: BaseTableData, event) => this.removeItem(item, event)
-        }
-      ]
-    }
-  ];
+  headers: TableHeader[] = [];
+  emptyData: EmptyOrderModel;
+  buttonData: ButtonModel;
 
   constructor(
     private store: Store,
@@ -61,8 +37,59 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetOrdersData());
+    this.getOrdersData();
+    this.initializeHeaderData();
+    this.initializeComponentsData();
     this.listenToOrdersDataChanges();
+  }
+
+  getOrdersData(): void {
+    this.store.dispatch(new GetOrdersData());
+  }
+
+  initializeHeaderData(): void {
+    this.headers = [
+      { id: 'symbol', name: 'Symbol' },
+      { id: 'id', name: 'Order ID' },
+      { id: 'side', name: 'Side' },
+      { id: 'size', name: 'Size' },
+      { id: 'openTime', name: 'Open Time' },
+      { id: 'openPrice', name: 'Open Price' },
+      { id: 'swap', name: 'Swap' },
+      { id: 'profit', name: 'Profit' },
+      {
+        id: 'actions',
+        name: '',
+        isAction: true,
+        mainActions: [
+          {
+            icon: faTrash,
+            name: 'removeGroup',
+            click: (group: BaseTableData, event) => this.removeGroup(group, event)
+          }
+        ],
+        childActions: [
+          {
+            icon: faX,
+            name: 'removeItem',
+            click: (item: BaseTableData, event) => this.removeItem(item, event)
+          }
+        ]
+      }
+    ];
+  }
+
+  initializeComponentsData(): void {
+    this.emptyData = {
+      icon: faFaceSurprise,
+      title: 'Brak zleceń',
+      details: 'Brak zleceń do wyświetlenia.'
+    };
+
+    this.buttonData = {
+      text: 'Załaduj zlecenia',
+      icon: faCloudArrowDown
+    };
   }
 
   listenToOrdersDataChanges(): void {
