@@ -1,18 +1,19 @@
 <table>
-  <thead class="h-12 bg-dark-background text-dark-text">
+  <thead class="h-12 bg-background text-text">
   <tr>
     <th *ngFor="let header of headers" class="w-auto truncate px-8">
       {{ header.name }}
     </th>
   </tr>
   </thead>
-  <tbody class="bg-dark-row text-dark-text">
+  <tbody class="bg-row text-text">
   <ng-container *ngFor="let group of _data; trackBy: trackByFn">
-    <tr (click)="toggleGroup(group.symbol)" class="cursor-pointer hover:bg-dark-hover">
+    <tr (click)="toggleGroup(group.symbol)" class="cursor-pointer hover:bg-hover">
       <td class="flex justify-center items-center h-12 truncate">
         <app-icon *ngIf="group.arrowIcon" [name]="group.arrowIcon" class="text-blue-400 text-xs pl-1 pr-4"></app-icon>
         <span class="w-20">{{ group.symbol }}</span>
-        <span class="flex justify-center items-center bg-black w-7 h-7 rounded-full">{{ group.children.length }}</span>
+        <span
+          class="flex justify-center items-center bg-background text-text w-7 h-7 rounded-full">{{ group.children.length }}</span>
       </td>
       <td *ngFor="let header of headers.slice(1)" class="w-full text-center font-bold truncate">
         <ng-container *ngIf="!header.isAction">

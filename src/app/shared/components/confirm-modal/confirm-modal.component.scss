@@ -1,0 +1,9 @@
+.p-dialog-content, .p-confirm-dialog-message, .p-dialog-footer {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.p-dialog-header {
+  background-color: var(--row);
+  color: var(--text);
+}

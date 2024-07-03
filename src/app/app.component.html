@@ -1,4 +1,9 @@
 <app-toast></app-toast>
 <app-confirm-modal></app-confirm-modal>
-<router-outlet></router-outlet>
+<div class="w-full h-full flex justify-center items-center">
+  <div class="flex flex-col justify-center items-end">
+    <app-theme-toggle class="block mb-6"></app-theme-toggle>
+    <router-outlet></router-outlet>
+  </div>
+</div>
 

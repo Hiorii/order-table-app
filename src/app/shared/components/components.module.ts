@@ -13,6 +13,7 @@ import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { EmptyComponent } from './empty/empty.component';
 import { ButtonComponent } from './button/button.component';
+import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
 
 const components = [
   BaseComponent,
@@ -22,7 +23,8 @@ const components = [
   ToastComponent,
   ConfirmModalComponent,
   EmptyComponent,
-  ButtonComponent
+  ButtonComponent,
+  ThemeToggleComponent
 ];
 const modules = [FontAwesomeModule, ToastModule, ConfirmDialogModule];
 
