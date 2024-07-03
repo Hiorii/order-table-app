@@ -48,36 +48,4 @@ export class TableComponent<T extends BaseTableData> {
     if (!item) return;
     item.arrowIcon = faChevronUp;
   }
-
-  onAction(action: string, item: any, event: Event): void {
-    event.stopPropagation();
-    this.actionTriggered.emit({action, item});
-  }
-
-  // removeItem(symbol: string, id: number, event: Event): void {
-  //   event.stopPropagation();
-  //   const group = this._data.find(group => group.symbol === symbol);
-  //   if (!group) return;
-  //
-  //   group.children = group.children.filter(item => item['id'] !== id);
-  //   if (group.children.length === 0) {
-  //     this._data = this._data.filter(group => group.symbol !== symbol);
-  //     this.expandedGroups.delete(symbol);
-  //   }
-  //   this.messageService.add({severity: 'success', summary: 'Success', detail: `"Zamknięto zlecenie nr ${id}"`});
-  // }
-  //
-  // removeGroup(symbol: string, event: Event): void {
-  //   event.stopPropagation();
-  //   const group = this._data.find(group => group.symbol === symbol);
-  //   if (!group) return;
-  //   const groupsIds = group.children.map(item => item['id']);
-  //   this._data = this._data.filter(group => group.symbol !== symbol);
-  //   this.expandedGroups.delete(symbol);
-  //   this.messageService.add({
-  //     severity: 'success',
-  //     summary: 'Success',
-  //     detail: `"Zamknięto zlecenia nr ${groupsIds.join(', ')}"`
-  //   });
-  // }
 }

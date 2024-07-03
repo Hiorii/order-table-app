@@ -11,6 +11,7 @@ import { TableHeader } from '../../../../shared/components/table/models/table-he
 import { faTrash, faX } from '@fortawesome/free-solid-svg-icons';
 import { BaseTableData } from '../../../../shared/components/table/models/base-table-data.model';
 import { ToastService } from '../../../../shared/components/toast/services/toast.service';
+import { ConfirmModalService } from '../../../../shared/components/confirm-modal/services/confirm-modal.service';
 
 @Component({
   selector: 'app-orders-table',
@@ -53,7 +54,8 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private store: Store,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private confirmModalService: ConfirmModalService
   ) {
     super();
   }
@@ -118,19 +120,35 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
     const group = this.orderGroups.find((group) => group.symbol === item['symbol']);
     if (!group) return;
 
-    group.children = group.children.filter((child) => child['id'] !== item.id);
-    if (group.children.length === 0) {
-      this.orderGroups = this.orderGroups.filter((group) => group.symbol !== item['symbol']);
-    }
-    this.toastService.showSuccess('Zamknięto zlecenie', `Zamknięto zlecenie nr ${item.id}`);
+    this.confirmModalService.confirm('Zamknięcie zlecenia', 'Czy na pewno chcesz zamknąć to zlecenie?', () => {
+      this.orderGroups = this.orderGroups
+        .map((group) => {
+          if (group.symbol === item['symbol']) {
+            return {
+              ...group,
+              children: group.children.filter((child) => child['id'] !== item['id'])
+            };
+          }
+          return group;
+        })
+        .filter((group) => group.children.length > 0);
+      this.toastService.showSuccess('Zamknięto zlecenie', `Zamknięto zlecenie nr ${item['id']}`);
+    });
   }
 
   removeGroup(group: BaseTableData, event?: Event): void {
     event?.stopPropagation();
     const groupData = this.orderGroups.find((g) => g.symbol === group['symbol']);
     if (!groupData) return;
-    const groupsIds = groupData.children.map((child) => child['id']);
-    this.orderGroups = this.orderGroups.filter((g) => g.symbol !== group['symbol']);
-    this.toastService.showSuccess('Zamknięto grupę', `Zamknięto zlecenia nr ${groupsIds.join(', ')}`);
+
+    this.confirmModalService.confirm(
+      'Zamknięcie grupy',
+      'Wszystkie zlecenia z grupy zostaną usunięte.<br>Czy na pewno chcesz zamknąć tę grupę?',
+      () => {
+        const groupsIds = groupData.children.map((child) => child['id']);
+        this.orderGroups = this.orderGroups.filter((g) => g.symbol !== group['symbol']);
+        this.toastService.showSuccess('Zamknięto grupę', `Zamknięto zlecenia nr ${groupsIds.join(', ')}`);
+      }
+    );
   }
 }

@@ -8,14 +8,17 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { DisplayValuePipe } from '../pipes/display-value.pipe';
 import { ToastComponent } from './toast/toast.component';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
-const components = [BaseComponent, TableComponent, IconComponent, DisplayValuePipe, ToastComponent];
+const components = [BaseComponent, TableComponent, IconComponent, DisplayValuePipe, ToastComponent, ConfirmModalComponent];
+const modules = [FontAwesomeModule, ToastModule, ConfirmDialogModule];
 
 @NgModule({
   declarations: [...components],
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, ToastModule],
-  exports: [...components, FontAwesomeModule, ToastModule],
-  providers: [FaIconLibrary, MessageService]
+  imports: [CommonModule, ReactiveFormsModule, ...modules],
+  exports: [...components, ...modules],
+  providers: [FaIconLibrary, MessageService, ConfirmationService]
 })
 export class ComponentsModule {}
