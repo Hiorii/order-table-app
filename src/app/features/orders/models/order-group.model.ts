@@ -7,5 +7,8 @@ export interface OrderGroup extends TableData<OrderModel> {
   openPrice: number;
   swap: number;
   profit: number;
+  styles?: {
+    [key: string]: string | undefined;
+  };
   children: OrderModel[];
 }

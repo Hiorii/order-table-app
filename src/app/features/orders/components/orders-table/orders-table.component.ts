@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BaseComponent } from '../../../../shared/components/base.component';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil, throttleTime } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { OrdersState } from '../../store/orders.state';
 import { OrderModel } from '../../../../core/models/order.model';
@@ -14,24 +14,27 @@ import { ToastService } from '../../../../shared/components/toast/services/toast
 import { ConfirmModalService } from '../../../../shared/components/confirm-modal/services/confirm-modal.service';
 import { EmptyOrderModel } from '../../../../shared/components/empty/models/empty-order.model';
 import { ButtonModel } from '../../../../shared/components/button/models/button.model';
+import { WebSocketService } from '../../../../core/services/web-socket.service';
 
 @Component({
   selector: 'app-orders-table',
   templateUrl: './orders-table.component.html',
-  styleUrl: './orders-table.component.scss'
+  styleUrls: ['./orders-table.component.scss']
 })
-export class OrdersTableComponent extends BaseComponent implements OnInit {
+export class OrdersTableComponent extends BaseComponent implements OnInit, OnDestroy {
   ordersData$: Observable<OrderModel[] | null> = inject(Store).select(OrdersState.ordersData);
   ordersData: OrderModel[] | null = [];
   orderGroups: OrderGroup[] = [];
   headers: TableHeader[] = [];
   emptyData: EmptyOrderModel;
   buttonData: ButtonModel;
+  private symbols: string[] = [];
 
   constructor(
     private store: Store,
     private toastService: ToastService,
-    private confirmModalService: ConfirmModalService
+    private confirmModalService: ConfirmModalService,
+    private webSocketService: WebSocketService
   ) {
     super();
   }
@@ -41,6 +44,12 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
     this.initializeHeaderData();
     this.initializeComponentsData();
     this.listenToOrdersDataChanges();
+    this.setupWebSocket();
+  }
+
+  override ngOnDestroy(): void {
+    this.unsubscribeFromSymbols();
+    this.webSocketService.disconnect();
   }
 
   getOrdersData(): void {
@@ -118,28 +127,111 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
 
     this.orderGroups = Object.keys(groups).map((symbol) => ({
       symbol: symbol as OrderSymbol,
-      size: this.calculateTotalSize(groups[symbol as OrderSymbol]),
-      openPrice: this.calculateAverageOpenPrice(groups[symbol as OrderSymbol]),
-      swap: this.calculateTotalSwap(groups[symbol as OrderSymbol]),
-      profit: this.calculateAverageProfit(groups[symbol as OrderSymbol]),
+      size: this.calculateTotalValue(groups[symbol as OrderSymbol], 'size'),
+      openPrice: this.calculateAverageValue(groups[symbol as OrderSymbol], 'openPrice'),
+      swap: this.calculateTotalValue(groups[symbol as OrderSymbol], 'swap'),
+      profit: this.calculateAverageValue(groups[symbol as OrderSymbol], 'profit'),
       children: groups[symbol as OrderSymbol]
     }));
   }
 
-  calculateTotalSize(orders: OrderModel[]): number {
-    return orders.reduce((acc, order) => acc + order.size, 0);
+  calculateTotalValue(orders: OrderModel[], element: string): number {
+    if (!element) return 0;
+    return orders.reduce((acc, order) => {
+      const el = order[element] as number;
+      return el ? acc + el : acc;
+    }, 0);
   }
 
-  calculateAverageOpenPrice(orders: OrderModel[]): number {
-    return orders.reduce((acc, order) => acc + order.openPrice, 0) / orders.length;
+  calculateAverageValue(orders: OrderModel[], element: string): number {
+    if (!element) return 0;
+    const total = orders.reduce((acc, order) => {
+      const el = order[element] as number;
+      return el ? acc + el : acc;
+    }, 0);
+    return total / orders.length;
   }
 
-  calculateTotalSwap(orders: OrderModel[]): number {
-    return orders.reduce((acc, order) => acc + order.swap, 0);
+  setupWebSocket(): void {
+    this.webSocketService.connect('wss://webquotes.geeksoft.pl/websocket/quotes');
+    this.webSocketService
+      .getConnectionState()
+      .pipe(
+        filter((isOpen) => isOpen),
+        switchMap(() => {
+          this.subscribeToSymbols();
+          return this.webSocketService.getMessages();
+        }),
+        throttleTime(5000),
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((message: any) => {
+        if (message.p === '/quotes/subscribed') {
+          const filteredData = message.d.filter((priceData: { s: string; b: number }) => this.symbols.includes(priceData.s));
+          this.updateProfitValues(filteredData);
+        }
+      });
   }
 
-  calculateAverageProfit(orders: OrderModel[]): number {
-    return orders.reduce((acc, order) => acc + order.profit, 0) / orders.length;
+  subscribeToSymbols(): void {
+    this.symbols = this.orderGroups.map((group) => group.symbol);
+    this.webSocketService.sendMessage({
+      p: '/subscribe/addlist',
+      d: this.symbols
+    });
+  }
+
+  unsubscribeFromSymbols(): void {
+    this.webSocketService.sendMessage({
+      p: '/subscribe/removelist',
+      d: this.symbols
+    });
+  }
+
+  updateProfitValues(data: { s: string; b: number }[]): void {
+    this.orderGroups = this.orderGroups.map((group) => {
+      const currentPriceData = data.find((priceData) => priceData.s === group.symbol);
+      const currentPrice = currentPriceData ? currentPriceData.b : null;
+      const updatedChildren = group.children.map((order) => this.calculateOrderProfit(order, currentPrice));
+      const totalProfit = updatedChildren.reduce((acc, order) => (order.profit ? acc + order.profit : 0), 0);
+      return {
+        ...group,
+        children: updatedChildren,
+        profit: totalProfit,
+        styles: totalProfit > 0 ? { profit: 'text-light-profitPositive' } : { profit: 'text-light-profitNegative' }
+      };
+    });
+  }
+
+  calculateOrderProfit(order: OrderModel, closePrice: number | null): OrderModel {
+    const price = closePrice ? closePrice : order.closePrice;
+    const multiplier = this.getMultiplier(order.symbol);
+    const sideMultiplier = order.side === 'BUY' ? 1 : -1;
+    const profit = ((price - order.openPrice) * multiplier * sideMultiplier) / 100;
+
+    const newStyles = {
+      ...(order.styles && typeof order.styles === 'object' ? order.styles : {}),
+      profit: profit > 0 ? 'text-light-profitPositive' : 'text-light-profitNegative'
+    };
+
+    return {
+      ...order,
+      profit,
+      styles: newStyles
+    };
+  }
+
+  getMultiplier(symbol: OrderSymbol): number {
+    switch (symbol) {
+      case 'BTCUSD':
+        return 10 ** 2;
+      case 'ETHUSD':
+        return 10 ** 3;
+      case 'TTWO.US':
+        return 10 ** 1;
+      default:
+        return 1;
+    }
   }
 
   removeItem(item: BaseTableData, event?: Event): void {

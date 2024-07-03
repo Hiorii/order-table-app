@@ -9,5 +9,8 @@ export interface OrderModel extends BaseTableData {
   symbol: OrderSymbol;
   side: string;
   size: number;
-  profit: number;
+  profit?: number;
+  styles?: {
+    [key: string]: string | undefined;
+  };
 }

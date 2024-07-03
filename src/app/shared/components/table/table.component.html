@@ -16,7 +16,9 @@
       </td>
       <td *ngFor="let header of headers.slice(1)" class="w-full text-center font-bold truncate">
         <ng-container *ngIf="!header.isAction">
-          {{ group[header.id] | displayValue:header.id }}
+            <span [ngClass]="group.styles?.[header.id]">
+              {{ group[header.id] | displayValue:header.id }}
+            </span>
         </ng-container>
         <ng-container *ngIf="header.isAction && header.mainActions">
           <ng-container *ngFor="let action of header.mainActions">
@@ -31,7 +33,9 @@
         <td></td>
         <td *ngFor="let header of headers.slice(1)" class="text-center h-12 truncate">
           <ng-container *ngIf="!header.isAction">
-            {{ item[header.id] | displayValue:header.id }}
+              <span [ngClass]="item.styles?.[header.id]">
+                {{ item[header.id] | displayValue:header.id }}
+              </span>
           </ng-container>
           <ng-container *ngIf="header.isAction && header.childActions">
             <ng-container *ngFor="let action of header.childActions">
