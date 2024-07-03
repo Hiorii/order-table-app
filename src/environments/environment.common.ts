@@ -3,4 +3,10 @@ export interface Env {
   instance: string;
   baseAppUrl: string;
   apiUrl: string;
+  webSockets: {
+    webSocketUrl: string;
+    addListAddress: string;
+    subscribeAddress: string;
+    unsubscribeAddress: string;
+  };
 }

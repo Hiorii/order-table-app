@@ -6,7 +6,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
   templateUrl: './empty.component.html'
 })
 export class EmptyComponent {
+  @Input({ required: true }) title: string;
   @Input() icon: IconDefinition;
-  @Input() title: string;
   @Input() details: string;
 }

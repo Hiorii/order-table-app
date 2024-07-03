@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
+import { DarkModeEnum } from '../enums/dark-mode.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
   private darkMode: boolean;
+  private darkModeLocalStorageKey = 'darkMode';
 
   constructor() {
-    this.darkMode = localStorage.getItem('darkMode') === 'true';
+    this.darkMode = this.getInitialTheme();
     this.updateBodyClass();
   }
 
@@ -17,17 +19,26 @@ export class ThemeService {
 
   toggleTheme(): void {
     this.darkMode = !this.darkMode;
-    localStorage.setItem('darkMode', this.darkMode.toString());
+    localStorage.setItem(this.darkModeLocalStorageKey, this.darkMode.toString());
     this.updateBodyClass();
   }
 
   private updateBodyClass(): void {
     if (this.darkMode) {
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
+      document.body.classList.add(DarkModeEnum.dark);
+      document.body.classList.remove(DarkModeEnum.light);
     } else {
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
+      document.body.classList.add(DarkModeEnum.light);
+      document.body.classList.remove(DarkModeEnum.dark);
     }
+  }
+
+  private getInitialTheme(): boolean {
+    const storedTheme = localStorage.getItem(this.darkModeLocalStorageKey);
+    if (storedTheme !== null) {
+      return storedTheme === 'true';
+    }
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 }

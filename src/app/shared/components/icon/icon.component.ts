@@ -3,11 +3,10 @@ import { IconDefinition, IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-icon',
-  templateUrl: './icon.component.html',
-  styleUrl: './icon.component.scss'
+  templateUrl: './icon.component.html'
 })
 export class IconComponent implements OnInit {
-  @Input() name: IconProp | IconDefinition;
+  @Input({ required: true }) name: IconProp | IconDefinition;
   @Input() fad = false;
   styles = Object.create(null);
   _iconStyles: { [key: string]: string };

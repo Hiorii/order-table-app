@@ -15,11 +15,14 @@ import { ConfirmModalService } from '../../../../shared/components/confirm-modal
 import { EmptyOrderModel } from '../../../../shared/components/empty/models/empty-order.model';
 import { ButtonModel } from '../../../../shared/components/button/models/button.model';
 import { WebSocketService } from '../../../../core/services/web-socket.service';
+import { QuotesSubscribedMessage } from '../../../../core/models/web-sockets/quotes-subscribed-message.model';
+import { QuoteData } from '../../../../core/models/web-sockets/quote-data.model';
+import { OrderItemsEnum } from '../../enums/order-items.enum';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-orders-table',
-  templateUrl: './orders-table.component.html',
-  styleUrls: ['./orders-table.component.scss']
+  templateUrl: './orders-table.component.html'
 })
 export class OrdersTableComponent extends BaseComponent implements OnInit, OnDestroy {
   ordersData$: Observable<OrderModel[] | null> = inject(Store).select(OrdersState.ordersData);
@@ -28,7 +31,9 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
   headers: TableHeader[] = [];
   emptyData: EmptyOrderModel;
   buttonData: ButtonModel;
-  private symbols: string[] = [];
+  symbols: string[] = [];
+  textPositive = 'text-light-profitPositive';
+  textNegative = 'text-light-profitNegative';
 
   constructor(
     private store: Store,
@@ -58,14 +63,14 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
 
   initializeHeaderData(): void {
     this.headers = [
-      { id: 'symbol', name: 'Symbol' },
-      { id: 'id', name: 'Order ID' },
-      { id: 'side', name: 'Side' },
-      { id: 'size', name: 'Size' },
-      { id: 'openTime', name: 'Open Time' },
-      { id: 'openPrice', name: 'Open Price' },
-      { id: 'swap', name: 'Swap' },
-      { id: 'profit', name: 'Profit' },
+      { id: OrderItemsEnum.symbol, name: 'Symbol' },
+      { id: OrderItemsEnum.id, name: 'Order ID' },
+      { id: OrderItemsEnum.side, name: 'Side' },
+      { id: OrderItemsEnum.size, name: 'Size' },
+      { id: OrderItemsEnum.openTime, name: 'Open Time' },
+      { id: OrderItemsEnum.openPrice, name: 'Open Price' },
+      { id: OrderItemsEnum.swap, name: 'Swap' },
+      { id: OrderItemsEnum.profit, name: 'Profit' },
       {
         id: 'actions',
         name: '',
@@ -127,10 +132,10 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
 
     this.orderGroups = Object.keys(groups).map((symbol) => ({
       symbol: symbol as OrderSymbol,
-      size: this.calculateTotalValue(groups[symbol as OrderSymbol], 'size'),
-      openPrice: this.calculateAverageValue(groups[symbol as OrderSymbol], 'openPrice'),
-      swap: this.calculateTotalValue(groups[symbol as OrderSymbol], 'swap'),
-      profit: this.calculateAverageValue(groups[symbol as OrderSymbol], 'profit'),
+      size: this.calculateTotalValue(groups[symbol as OrderSymbol], OrderItemsEnum.size),
+      openPrice: this.calculateAverageValue(groups[symbol as OrderSymbol], OrderItemsEnum.openPrice),
+      swap: this.calculateTotalValue(groups[symbol as OrderSymbol], OrderItemsEnum.swap),
+      profit: this.calculateAverageValue(groups[symbol as OrderSymbol], OrderItemsEnum.profit),
       children: groups[symbol as OrderSymbol]
     }));
   }
@@ -153,7 +158,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
   }
 
   setupWebSocket(): void {
-    this.webSocketService.connect('wss://webquotes.geeksoft.pl/websocket/quotes');
+    this.webSocketService.connect(environment.webSockets.webSocketUrl);
     this.webSocketService
       .getConnectionState()
       .pipe(
@@ -165,9 +170,9 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
         throttleTime(5000),
         takeUntil(this.destroyed$)
       )
-      .subscribe((message: any) => {
-        if (message.p === '/quotes/subscribed') {
-          const filteredData = message.d.filter((priceData: { s: string; b: number }) => this.symbols.includes(priceData.s));
+      .subscribe((message: QuotesSubscribedMessage) => {
+        if (message.p === environment.webSockets.subscribeAddress) {
+          const filteredData = message.d.filter((priceData: QuoteData) => this.symbols.includes(priceData.s));
           this.updateProfitValues(filteredData);
         }
       });
@@ -176,19 +181,19 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
   subscribeToSymbols(): void {
     this.symbols = this.orderGroups.map((group) => group.symbol);
     this.webSocketService.sendMessage({
-      p: '/subscribe/addlist',
+      p: environment.webSockets.addListAddress,
       d: this.symbols
     });
   }
 
   unsubscribeFromSymbols(): void {
     this.webSocketService.sendMessage({
-      p: '/subscribe/removelist',
+      p: environment.webSockets.unsubscribeAddress,
       d: this.symbols
     });
   }
 
-  updateProfitValues(data: { s: string; b: number }[]): void {
+  updateProfitValues(data: QuoteData[]): void {
     this.orderGroups = this.orderGroups.map((group) => {
       const currentPriceData = data.find((priceData) => priceData.s === group.symbol);
       const currentPrice = currentPriceData ? currentPriceData.b : null;
@@ -198,7 +203,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
         ...group,
         children: updatedChildren,
         profit: totalProfit,
-        styles: totalProfit > 0 ? { profit: 'text-light-profitPositive' } : { profit: 'text-light-profitNegative' }
+        styles: totalProfit > 0 ? { profit: this.textPositive } : { profit: this.textNegative }
       };
     });
   }
@@ -211,7 +216,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
 
     const newStyles = {
       ...(order.styles && typeof order.styles === 'object' ? order.styles : {}),
-      profit: profit > 0 ? 'text-light-profitPositive' : 'text-light-profitNegative'
+      profit: profit > 0 ? this.textPositive : this.textNegative
     };
 
     return {
@@ -223,11 +228,11 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
 
   getMultiplier(symbol: OrderSymbol): number {
     switch (symbol) {
-      case 'BTCUSD':
+      case OrderSymbol.BTCUSD:
         return 10 ** 2;
-      case 'ETHUSD':
+      case OrderSymbol.ETHUSD:
         return 10 ** 3;
-      case 'TTWO.US':
+      case OrderSymbol.TTWO_US:
         return 10 ** 1;
       default:
         return 1;

@@ -10,22 +10,21 @@ import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  styleUrls: ['./table.component.scss'],
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent<T extends BaseTableData> {
-  @Input() headers: TableHeader[] = [];
+  @Input({required: true}) headers: TableHeader[] = [];
 
   @Input() set data(value: TableData<T>[]) {
     if (!value) return;
     this._data = value;
-    this._data.forEach(item => {
+    this._data.forEach((item) => {
       item.arrowIcon = faChevronDown;
-    })
+    });
   }
 
-  @Output() actionTriggered = new EventEmitter<{ action: string, item: any }>();
+  @Output() actionTriggered = new EventEmitter<{ action: string; item: T }>();
   public expandedGroups: Set<string> = new Set<string>();
   public _data: TableData<T>[] = [];
 
@@ -39,13 +38,13 @@ export class TableComponent<T extends BaseTableData> {
     }
   }
 
-  trackByFn(index: number, item: any): any {
-    return item.symbol || index;
+  trackByFn(_: number, item: TableData<T>): number | undefined {
+    return item.id;
   }
 
-  setArrowIcon(symbol: string, faChevronUp: IconDefinition) {
-    const item = this._data.find(item => item.symbol === symbol);
+  setArrowIcon(symbol: string, icon: IconDefinition): void {
+    const item = this._data.find((item) => item.symbol === symbol);
     if (!item) return;
-    item.arrowIcon = faChevronUp;
+    item.arrowIcon = icon;
   }
 }

@@ -10,8 +10,4 @@ export class ToastService {
   showSuccess(summary: string, detail: string): void {
     this.messageService.add({ severity: 'success', summary, detail });
   }
-
-  showError(summary: string, detail: string): void {
-    this.messageService.add({ severity: 'error', summary, detail });
-  }
 }

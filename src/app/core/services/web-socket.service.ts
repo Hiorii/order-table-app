@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { QuotesSubscribedMessage } from '../models/web-sockets/quotes-subscribed-message.model';
+import { SubscribeMessage } from '../models/web-sockets/subscribe-message.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebSocketService {
   private socket: WebSocket;
-  private messageSubject: Subject<any> = new Subject<any>();
+  private messageSubject: Subject<QuotesSubscribedMessage> = new Subject<QuotesSubscribedMessage>();
   private connectionStateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   connect(url: string): void {
@@ -17,7 +19,8 @@ export class WebSocketService {
     };
 
     this.socket.onmessage = (event) => {
-      this.messageSubject.next(JSON.parse(event.data));
+      const message: QuotesSubscribedMessage = JSON.parse(event.data);
+      this.messageSubject.next(message);
     };
 
     this.socket.onclose = () => {
@@ -26,7 +29,7 @@ export class WebSocketService {
     };
   }
 
-  getMessages(): Observable<any> {
+  getMessages(): Observable<QuotesSubscribedMessage> {
     return this.messageSubject.asObservable();
   }
 
@@ -34,7 +37,7 @@ export class WebSocketService {
     return this.connectionStateSubject.asObservable();
   }
 
-  sendMessage(message: any): void {
+  sendMessage(message: SubscribeMessage): void {
     this.socket.send(JSON.stringify(message));
   }
 
