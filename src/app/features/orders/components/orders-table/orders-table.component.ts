@@ -8,7 +8,6 @@ import { GetOrdersData } from '../../store/orders.actions';
 import { OrderGroup } from '../../models/order-group.model';
 import { OrderSymbol } from '../../enums/order-symbol.enum';
 import { TableHeader } from '../../../../shared/components/table/models/table-header.model';
-import { format } from 'date-fns';
 
 @Component({
   selector: 'app-orders-table',
@@ -27,7 +26,8 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
     { id: 'openTime', name: 'Open Time' },
     { id: 'openPrice', name: 'Open Price' },
     { id: 'swap', name: 'Swap' },
-    { id: 'profit', name: 'Profit' }
+    { id: 'profit', name: 'Profit' },
+    { id: 'remove', name: '', isAction: true }
   ];
 
   constructor(private store: Store) {
@@ -41,10 +41,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
 
   listenToOrdersDataChanges(): void {
     this.ordersData$.pipe(filter(Boolean), takeUntil(this.destroyed$)).subscribe((data) => {
-      this.ordersData = data.map((order) => ({
-        ...order,
-        openTime: format(new Date(order.openTime), 'dd.MM.yyyy HH:mm:ss')
-      }));
+      this.ordersData = data;
       this.groupOrders();
     });
   }
@@ -65,20 +62,30 @@ export class OrdersTableComponent extends BaseComponent implements OnInit {
       },
       {} as Record<OrderSymbol, OrderModel[]>
     );
-    this.orderGroups = Object.entries(groups).map(([symbol, orders]) => {
-      const totalSize = orders.reduce((acc, order) => acc + order.size, 0);
-      const avgOpenPrice = orders.reduce((acc, order) => acc + order.openPrice, 0) / orders.length;
-      const avgProfit = orders.reduce((acc, order) => acc + order.profit, 0) / orders.length;
-      const totalSwap = orders.reduce((acc, order) => acc + order.swap, 0);
 
-      return {
-        symbol: symbol as OrderSymbol,
-        size: totalSize,
-        openPrice: avgOpenPrice,
-        swap: totalSwap,
-        profit: 12.2131,
-        children: orders
-      } as OrderGroup;
-    });
+    this.orderGroups = Object.keys(groups).map((symbol) => ({
+      symbol: symbol as OrderSymbol,
+      size: this.calculateTotalSize(groups[symbol as OrderSymbol]),
+      openPrice: this.calculateAverageOpenPrice(groups[symbol as OrderSymbol]),
+      swap: this.calculateTotalSwap(groups[symbol as OrderSymbol]),
+      profit: this.calculateAverageProfit(groups[symbol as OrderSymbol]),
+      children: groups[symbol as OrderSymbol]
+    }));
+  }
+
+  calculateTotalSize(orders: OrderModel[]): number {
+    return orders.reduce((acc, order) => acc + order.size, 0);
+  }
+
+  calculateAverageOpenPrice(orders: OrderModel[]): number {
+    return orders.reduce((acc, order) => acc + order.openPrice, 0) / orders.length;
+  }
+
+  calculateTotalSwap(orders: OrderModel[]): number {
+    return orders.reduce((acc, order) => acc + order.swap, 0);
+  }
+
+  calculateAverageProfit(orders: OrderModel[]): number {
+    return orders.reduce((acc, order) => acc + order.profit, 0) / orders.length;
   }
 }

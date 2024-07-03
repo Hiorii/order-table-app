@@ -15,14 +15,26 @@
         <span class="flex justify-center items-center bg-black w-7 h-7 rounded-full">{{ group.children.length }}</span>
       </td>
       <td *ngFor="let header of headers.slice(1)" class="w-full text-center font-bold truncate">
-        {{ group[header.id] | displayValue:header.id }}
+        <ng-container *ngIf="!header.isAction">
+          {{ group[header.id] | displayValue:header.id }}
+        </ng-container>
+        <ng-container *ngIf="header.isAction">
+          <app-icon (click)="removeGroup(group.symbol, $event)" [name]="removeGroupIcon"
+                    class="text-blue-400 hover:text-blue-500"></app-icon>
+        </ng-container>
       </td>
     </tr>
     <ng-container *ngIf="expandedGroups.has(group.symbol)">
       <tr *ngFor="let item of group.children">
         <td></td>
         <td *ngFor="let header of headers.slice(1)" class="text-center h-12 truncate">
-          {{ item[header.id] | displayValue:header.id }}
+          <ng-container *ngIf="!header.isAction">
+            {{ item[header.id] | displayValue:header.id }}
+          </ng-container>
+          <ng-container *ngIf="header.isAction">
+            <app-icon (click)="removeItem(group.symbol ,item['id'], $event)" [name]="removeItemIcon"
+                      class="text-blue-400 cursor-pointer hover:text-blue-500"></app-icon>
+          </ng-container>
         </td>
       </tr>
     </ng-container>
