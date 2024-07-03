@@ -1,4 +1,3 @@
-// src/app/shared/components/table/table.component.ts
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TableHeader } from './models/table-header.model';
 import { TableData } from './models/table-data.model';
@@ -14,7 +13,7 @@ import { MessageService } from 'primeng/api';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent<T extends BaseTableData> {
-  @Input({required: true}) headers: TableHeader[] = [];
+  @Input({ required: true }) headers: TableHeader[] = [];
 
   @Input() set data(value: TableData<T>[]) {
     if (!value) return;

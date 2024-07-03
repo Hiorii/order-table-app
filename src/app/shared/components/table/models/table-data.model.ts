@@ -1,4 +1,3 @@
-// src/app/shared/components/table/models/table-data.model.ts
 import { BaseTableData } from './base-table-data.model';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 

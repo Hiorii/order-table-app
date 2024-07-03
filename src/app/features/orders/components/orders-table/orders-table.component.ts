@@ -19,6 +19,7 @@ import { QuotesSubscribedMessage } from '../../../../core/models/web-sockets/quo
 import { QuoteData } from '../../../../core/models/web-sockets/quote-data.model';
 import { OrderItemsEnum } from '../../enums/order-items.enum';
 import { environment } from '../../../../../environments/environment';
+import { ProfitCalculationService } from '../../services/profit-calculation.service';
 
 @Component({
   selector: 'app-orders-table',
@@ -32,14 +33,13 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
   emptyData: EmptyOrderModel;
   buttonData: ButtonModel;
   symbols: string[] = [];
-  textPositive = 'text-light-profitPositive';
-  textNegative = 'text-light-profitNegative';
 
   constructor(
     private store: Store,
     private toastService: ToastService,
     private confirmModalService: ConfirmModalService,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private profitCalculationService: ProfitCalculationService
   ) {
     super();
   }
@@ -173,7 +173,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
       .subscribe((message: QuotesSubscribedMessage) => {
         if (message.p === environment.webSockets.subscribeAddress) {
           const filteredData = message.d.filter((priceData: QuoteData) => this.symbols.includes(priceData.s));
-          this.updateProfitValues(filteredData);
+          this.orderGroups = this.profitCalculationService.updateProfitValues(this.orderGroups, filteredData);
         }
       });
   }
@@ -191,52 +191,6 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
       p: environment.webSockets.unsubscribeAddress,
       d: this.symbols
     });
-  }
-
-  updateProfitValues(data: QuoteData[]): void {
-    this.orderGroups = this.orderGroups.map((group) => {
-      const currentPriceData = data.find((priceData) => priceData.s === group.symbol);
-      const currentPrice = currentPriceData ? currentPriceData.b : null;
-      const updatedChildren = group.children.map((order) => this.calculateOrderProfit(order, currentPrice));
-      const totalProfit = updatedChildren.reduce((acc, order) => (order.profit ? acc + order.profit : 0), 0);
-      return {
-        ...group,
-        children: updatedChildren,
-        profit: totalProfit,
-        styles: totalProfit > 0 ? { profit: this.textPositive } : { profit: this.textNegative }
-      };
-    });
-  }
-
-  calculateOrderProfit(order: OrderModel, closePrice: number | null): OrderModel {
-    const price = closePrice ? closePrice : order.closePrice;
-    const multiplier = this.getMultiplier(order.symbol);
-    const sideMultiplier = order.side === 'BUY' ? 1 : -1;
-    const profit = ((price - order.openPrice) * multiplier * sideMultiplier) / 100;
-
-    const newStyles = {
-      ...(order.styles && typeof order.styles === 'object' ? order.styles : {}),
-      profit: profit > 0 ? this.textPositive : this.textNegative
-    };
-
-    return {
-      ...order,
-      profit,
-      styles: newStyles
-    };
-  }
-
-  getMultiplier(symbol: OrderSymbol): number {
-    switch (symbol) {
-      case OrderSymbol.BTCUSD:
-        return 10 ** 2;
-      case OrderSymbol.ETHUSD:
-        return 10 ** 3;
-      case OrderSymbol.TTWO_US:
-        return 10 ** 1;
-      default:
-        return 1;
-    }
   }
 
   removeItem(item: BaseTableData, event?: Event): void {
