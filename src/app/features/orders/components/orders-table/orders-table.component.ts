@@ -10,7 +10,6 @@ import { OrderSymbol } from '../../enums/order-symbol.enum';
 import { TableHeader } from '../../../../shared/components/table/models/table-header.model';
 import { faCloudArrowDown, faFaceSurprise, faTrash, faX } from '@fortawesome/free-solid-svg-icons';
 import { BaseTableData } from '../../../../shared/components/table/models/base-table-data.model';
-import { ToastService } from '../../../../shared/components/toast/services/toast.service';
 import { ConfirmModalService } from '../../../../shared/components/confirm-modal/services/confirm-modal.service';
 import { EmptyOrderModel } from '../../../../shared/components/empty/models/empty-order.model';
 import { ButtonModel } from '../../../../shared/components/button/models/button.model';
@@ -20,6 +19,7 @@ import { QuoteData } from '../../../../core/models/web-sockets/quote-data.model'
 import { OrderItemsEnum } from '../../enums/order-items.enum';
 import { environment } from '../../../../../environments/environment';
 import { ProfitCalculationService } from '../../services/profit-calculation.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-orders-table',
@@ -36,7 +36,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
 
   constructor(
     private store: Store,
-    private toastService: ToastService,
+    private messageService: MessageService,
     private confirmModalService: ConfirmModalService,
     private webSocketService: WebSocketService,
     private profitCalculationService: ProfitCalculationService
@@ -210,7 +210,11 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
           return group;
         })
         .filter((group) => group.children.length > 0);
-      this.toastService.showSuccess('Zamknięto zlecenie', `Zamknięto zlecenie nr ${item['id']}`);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Zamknięto zlecenie',
+        detail: `Zamknięto zlecenie nr ${item['id']}`
+      });
     });
   }
 
@@ -225,7 +229,11 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
       () => {
         const groupsIds = groupData.children.map((child) => child['id']);
         this.orderGroups = this.orderGroups.filter((g) => g.symbol !== group['symbol']);
-        this.toastService.showSuccess('Zamknięto grupę', `Zamknięto zlecenia nr ${groupsIds.join(', ')}`);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Zamknięto grupę',
+          detail: `Zamknięto zlecenia nr ${groupsIds.join(', ')}`
+        });
       }
     );
   }

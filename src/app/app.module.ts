@@ -9,6 +9,7 @@ import { NgxsModule } from '@ngxs/store';
 import { environment } from '../environments/environment';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { SharedModule } from './shared/shared.module';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import { SharedModule } from './shared/shared.module';
     SharedModule
   ],
   declarations: [AppComponent],
+  providers: [MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
