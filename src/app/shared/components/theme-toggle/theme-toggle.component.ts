@@ -13,13 +13,13 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThemeToggleComponent implements OnInit {
-  protected readonly faMoon = faMoon;
-  protected readonly faSun = faSun;
   private themeService = inject(ThemeService);
 
   darkMode$: Observable<boolean>;
   buttonText$: Observable<string>;
   buttonIcon$: Observable<IconDefinition>;
+  faMoon = faMoon;
+  faSun = faSun;
 
   ngOnInit(): void {
     this.darkMode$ = this.themeService.darkMode$;

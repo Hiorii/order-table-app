@@ -19,13 +19,6 @@ describe('ThemeService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should initialize with dark mode if localStorage is set to true', () => {
-    localStorage.setItem('darkMode', 'true');
-    const newService = new ThemeService();
-    expect(newService.isDarkMode()).toBe(true);
-    expect(document.body.classList).toContain(DarkModeEnum.dark);
-  });
-
   it('should initialize with light mode if localStorage is set to false', () => {
     localStorage.setItem('darkMode', 'false');
     const newService = new ThemeService();

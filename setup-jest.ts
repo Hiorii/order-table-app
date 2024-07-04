@@ -1,3 +1,5 @@
+import 'jest-preset-angular/setup-jest';
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
