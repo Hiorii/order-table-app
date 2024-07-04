@@ -4,6 +4,7 @@ import { ApiService } from './api.service';
 import { environment } from '../../../environments/environment';
 import { OrderModel } from '../models/order.model';
 import { OrderSymbol } from '../../features/orders/enums/order-symbol.enum';
+import { OrderSideEnum } from '../enums/order-side.enum';
 
 describe('ApiService', () => {
   let service: ApiService;
@@ -35,7 +36,7 @@ describe('ApiService', () => {
         swap: 1,
         closePrice: 110,
         symbol: OrderSymbol.BTCUSD,
-        side: 'BUY',
+        side: OrderSideEnum.BUY,
         size: 1,
         profit: 10
       },
@@ -46,7 +47,7 @@ describe('ApiService', () => {
         swap: 2,
         closePrice: 220,
         symbol: OrderSymbol.ETHUSD,
-        side: 'SELL',
+        side: OrderSideEnum.SELL,
         size: 2,
         profit: 20
       }

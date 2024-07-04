@@ -22,7 +22,7 @@ export class ButtonDirective implements OnChanges {
   @Input() appButtonIcon: IconDefinition | undefined | null;
 
   @HostBinding('class') get classes(): string {
-    return 'rounded-2xl w-full h-full font-semibold pl-12 pr-12 bg-background text-text p-4 text-xl flex justify-center items-center';
+    return 'bg-background flex font-semibold h-full items-center justify-center p-4 pl-12 pr-12 rounded-2xl text-text text-xl w-full';
   }
 
   private el = inject(ElementRef);

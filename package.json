@@ -11,7 +11,8 @@
     "format": "prettier ./**/*.{ts,html,scss} --write",
     "format:check": "prettier ./**/*.{ts,html,scss} --check",
     "lint": "eslint ./**/*.{ts,html,scss} --fix",
-    "cypress": "npx cypress open"
+    "cypress": "npx cypress open",
+    "ci": "npm run format && npm run lint && npm run test && npm run build"
   },
   "private": true,
   "dependencies": {

@@ -1,52 +1,53 @@
 <table>
   <thead class="h-12 bg-background text-text">
-  <tr>
-    <th *ngFor="let header of headers" class="w-auto truncate px-8">
-      {{ header.name }}
-    </th>
-  </tr>
+    <tr>
+      <th *ngFor="let header of headers" class="w-auto truncate px-8">
+        {{ header.name }}
+      </th>
+    </tr>
   </thead>
   <tbody class="bg-row text-text">
-  <ng-container *ngFor="let group of _data; trackBy: trackByFn">
-    <tr (click)="toggleGroup(group.symbol)" class="cursor-pointer bg-hover">
-      <td class="flex justify-center items-center h-12 truncate">
-        <app-icon *ngIf="group.arrowIcon" [name]="group.arrowIcon" class="text-blue-400 text-xs pl-1 pr-4"></app-icon>
-        <span class="w-20">{{ group.symbol }}</span>
-        <span
-          class="flex justify-center items-center bg-background text-text w-7 h-7 rounded-full">{{ group.children.length }}</span>
-      </td>
-      <td *ngFor="let header of headers?.slice(1)" class="w-full text-center font-bold truncate">
-        <ng-container *ngIf="!header.isAction">
-            <span [ngClass]="group.styles?.[header.id]">
-              {{ group[header.id] | displayValue:header.id }}
-            </span>
-        </ng-container>
-        <ng-container *ngIf="header.isAction && header.mainActions">
-          <ng-container *ngFor="let action of header.mainActions">
-            <app-icon (click)="action.click(group, $event)" [name]="action.icon"
-                      class="text-blue-400 hover:text-blue-500"></app-icon>
-          </ng-container>
-        </ng-container>
-      </td>
-    </tr>
-    <ng-container *ngIf="expandedGroups.has(group.symbol)">
-      <tr *ngFor="let item of group.children">
-        <td></td>
-        <td *ngFor="let header of headers?.slice(1)" class="text-center h-12 truncate">
+    <ng-container *ngFor="let group of _data; trackBy: trackByFn">
+      <tr (click)="toggleGroup(group.symbol)" class="cursor-pointer bg-hover">
+        <td class="flex justify-center items-center h-12 truncate">
+          <app-icon *ngIf="group.arrowIcon" [name]="group.arrowIcon" class="text-blue-400 text-xs pl-1 pr-4"></app-icon>
+          <span class="w-20">{{ group.symbol }}</span>
+          <span class="flex justify-center items-center bg-background text-text w-7 h-7 rounded-full">{{ group.children.length }}</span>
+        </td>
+        <td *ngFor="let header of headers?.slice(1)" class="w-full text-center font-bold truncate">
           <ng-container *ngIf="!header.isAction">
-              <span [ngClass]="item.styles?.[header.id]">
-                {{ item[header.id] | displayValue:header.id }}
-              </span>
+            <span [ngClass]="group.styles?.[header.id]">
+              {{ group[header.id] | displayValue: header.id }}
+            </span>
           </ng-container>
-          <ng-container *ngIf="header.isAction && header.childActions">
-            <ng-container *ngFor="let action of header.childActions">
-              <app-icon (click)="action.click(item, $event)" [name]="action.icon"
-                        class="text-blue-400 cursor-pointer hover:text-blue-500"></app-icon>
+          <ng-container *ngIf="header.isAction && header.mainActions">
+            <ng-container *ngFor="let action of header.mainActions">
+              <app-icon (click)="action.click(group, $event)" [name]="action.icon" class="text-blue-400 hover:text-blue-500"></app-icon>
             </ng-container>
           </ng-container>
         </td>
       </tr>
+      <ng-container *ngIf="expandedGroups.has(group.symbol)">
+        <tr *ngFor="let item of group.children">
+          <td></td>
+          <td *ngFor="let header of headers?.slice(1)" class="text-center h-12 truncate">
+            <ng-container *ngIf="!header.isAction">
+              <span [ngClass]="item.styles?.[header.id]">
+                {{ item[header.id] | displayValue: header.id }}
+              </span>
+            </ng-container>
+            <ng-container *ngIf="header.isAction && header.childActions">
+              <ng-container *ngFor="let action of header.childActions">
+                <app-icon
+                  (click)="action.click(item, $event)"
+                  [name]="action.icon"
+                  class="text-blue-400 cursor-pointer hover:text-blue-500"
+                ></app-icon>
+              </ng-container>
+            </ng-container>
+          </td>
+        </tr>
+      </ng-container>
     </ng-container>
-  </ng-container>
   </tbody>
 </table>

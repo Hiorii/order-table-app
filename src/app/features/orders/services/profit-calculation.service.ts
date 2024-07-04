@@ -3,6 +3,7 @@ import { OrderModel } from '../../../core/models/order.model';
 import { OrderSymbol } from '../enums/order-symbol.enum';
 import { QuoteData } from '../../../core/models/web-sockets/quote-data.model';
 import { OrderGroup } from '../models/order-group.model';
+import { OrderSideEnum } from '../../../core/enums/order-side.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,7 @@ export class ProfitCalculationService {
   calculateOrderProfit(order: OrderModel, closePrice: number | null): OrderModel {
     const price = closePrice ? closePrice : order.closePrice;
     const multiplier = this.getMultiplier(order.symbol);
-    const sideMultiplier = order.side === 'BUY' ? 1 : -1;
+    const sideMultiplier = order.side === OrderSideEnum.BUY ? 1 : -1;
     const profit = ((price - order.openPrice) * multiplier * sideMultiplier) / 100;
 
     const newStyles = {

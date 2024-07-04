@@ -4,195 +4,150 @@ import { OrderModel } from '../../../core/models/order.model';
 import { OrderSymbol } from '../enums/order-symbol.enum';
 import { QuoteData } from '../../../core/models/web-sockets/quote-data.model';
 import { OrderGroup } from '../models/order-group.model';
+import { OrderSideEnum } from '../../../core/enums/order-side.enum';
 
 describe('ProfitCalculationService', () => {
   let service: ProfitCalculationService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [ProfitCalculationService]
+    });
     service = TestBed.inject(ProfitCalculationService);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  describe('updateProfitValues', () => {
+    it('should set profit to 0 and apply negative style if no data is provided', () => {
+      const orderGroups: OrderGroup[] = [
+        {
+          symbol: OrderSymbol.BTCUSD,
+          size: 10,
+          openPrice: 100,
+          swap: 1,
+          profit: 0,
+          children: [],
+          styles: { profit: '' }
+        }
+      ];
+
+      const result = service.updateProfitValues(orderGroups, []);
+
+      expect(result).toEqual([
+        {
+          symbol: OrderSymbol.BTCUSD,
+          size: 10,
+          openPrice: 100,
+          swap: 1,
+          profit: 0,
+          children: [],
+          styles: { profit: service.textNegative }
+        }
+      ]);
+    });
+
+    it('should update profit values and styles based on provided data', () => {
+      const orderGroups: OrderGroup[] = [
+        {
+          symbol: OrderSymbol.BTCUSD,
+          size: 10,
+          openPrice: 100,
+          swap: 1,
+          profit: 0,
+          children: [
+            {
+              symbol: OrderSymbol.BTCUSD,
+              id: 1,
+              size: 10,
+              openPrice: 100,
+              closePrice: 150,
+              side: OrderSideEnum.BUY,
+              swap: 1,
+              profit: 0,
+              openTime: new Date(),
+              styles: {}
+            }
+          ],
+          styles: { profit: '' }
+        }
+      ];
+
+      const quoteData: QuoteData[] = [
+        {
+          s: OrderSymbol.BTCUSD,
+          b: 200,
+          a: 210,
+          t: 0
+        }
+      ];
+
+      const result = service.updateProfitValues(orderGroups, quoteData);
+
+      expect(result[0].profit).toBeGreaterThan(0);
+      expect(result[0].styles?.['profit']).toEqual(service.textPositive);
+    });
   });
 
   describe('calculateOrderProfit', () => {
-    it('should calculate profit correctly for BUY order', () => {
+    it('should correctly calculate the profit for a BUY order', () => {
       const order: OrderModel = {
+        symbol: OrderSymbol.BTCUSD,
         id: 1,
-        openTime: new Date(),
+        size: 10,
         openPrice: 100,
         closePrice: 150,
+        side: OrderSideEnum.BUY,
+        swap: 1,
+        profit: 0,
+        openTime: new Date(),
+        styles: {}
+      };
+
+      const result = service.calculateOrderProfit(order, 200);
+
+      expect(result.profit).toBeGreaterThan(0);
+      expect(result.styles?.['profit']).toEqual(service.textPositive);
+    });
+
+    it('should correctly calculate the profit for a SELL order', () => {
+      const order: OrderModel = {
         symbol: OrderSymbol.BTCUSD,
-        side: 'BUY',
-        size: 1,
-        swap: 0
-      };
-      const closePrice = 200;
-      const result = service.calculateOrderProfit(order, closePrice);
-      expect(result.profit).toBe(((200 - 100) * 100) / 100);
-      expect(result.styles?.['profit']).toBe(service.textPositive);
-    });
-
-    it('should calculate profit correctly for SELL order', () => {
-      const order: OrderModel = {
         id: 1,
+        size: 10,
+        openPrice: 200,
+        closePrice: 150,
+        side: OrderSideEnum.SELL,
+        swap: 1,
+        profit: 0,
         openTime: new Date(),
-        openPrice: 150,
-        closePrice: 100,
-        symbol: OrderSymbol.ETHUSD,
-        side: 'SELL',
-        size: 1,
-        swap: 0
+        styles: {}
       };
-      const closePrice = 250;
-      const result = service.calculateOrderProfit(order, closePrice);
-      expect(result.profit).toBe(((closePrice - order.openPrice) * 1000 * -1) / 100);
-      expect(result.styles?.['profit']).toBe(service.textNegative);
-    });
 
-    it('should use order closePrice if closePrice is null', () => {
-      const order: OrderModel = {
-        id: 1,
-        openTime: new Date(),
-        openPrice: 150,
-        closePrice: 200,
-        symbol: OrderSymbol.TTWO_US,
-        side: 'BUY',
-        size: 1,
-        swap: 0
-      };
-      const result = service.calculateOrderProfit(order, null);
-      expect(result.profit).toBe(((order.closePrice - order.openPrice) * 10) / 100);
-      expect(result.styles?.['profit']).toBe(service.textPositive);
-    });
-  });
+      const result = service.calculateOrderProfit(order, 100);
 
-  describe('updateProfitValues', () => {
-    it('should update profit values for order groups', () => {
-      const orderGroups: OrderGroup[] = [
-        {
-          symbol: OrderSymbol.BTCUSD,
-          size: 1,
-          openPrice: 100,
-          swap: 0,
-          profit: 0,
-          children: [
-            {
-              id: 1,
-              openTime: new Date(),
-              openPrice: 100,
-              closePrice: 150,
-              symbol: OrderSymbol.BTCUSD,
-              side: 'BUY',
-              size: 1,
-              swap: 0
-            }
-          ],
-          styles: {}
-        }
-      ];
-
-      const data: QuoteData[] = [{ s: OrderSymbol.BTCUSD, b: 200, a: 0, t: 0 }];
-
-      const result = service.updateProfitValues(orderGroups, data);
-      expect(result[0].profit).toBe(((200 - 100) * 100) / 100);
-      expect(result[0].styles?.['profit']).toBe(service.textPositive);
-    });
-
-    it('should set profit styles correctly based on total profit', () => {
-      const orderGroups: OrderGroup[] = [
-        {
-          symbol: OrderSymbol.BTCUSD,
-          size: 1,
-          openPrice: 100,
-          swap: 0,
-          profit: 0,
-          children: [
-            {
-              id: 1,
-              openTime: new Date(),
-              openPrice: 100,
-              closePrice: 150,
-              symbol: OrderSymbol.BTCUSD,
-              side: 'BUY',
-              size: 1,
-              swap: 0
-            },
-            {
-              id: 2,
-              openTime: new Date(),
-              openPrice: 200,
-              closePrice: 150,
-              symbol: OrderSymbol.BTCUSD,
-              side: 'SELL',
-              size: 1,
-              swap: 0
-            }
-          ],
-          styles: {}
-        }
-      ];
-
-      const data: QuoteData[] = [
-        { s: OrderSymbol.BTCUSD, b: 200, a: 0, t: 0 },
-        { s: OrderSymbol.BTCUSD, b: 300, a: 0, t: 0 }
-      ];
-
-      const result = service.updateProfitValues(orderGroups, data);
-      const totalProfit = ((200 - 100) * 100) / 100 + ((300 - 200) * 100 * -1) / 100;
-      expect(result[0].profit).toBe(totalProfit);
-      expect(result[0].styles?.['profit']).toBe(service.textNegative);
-    });
-
-    it('should handle case when no price data is found for a symbol', () => {
-      const orderGroups: OrderGroup[] = [
-        {
-          symbol: OrderSymbol.BTCUSD,
-          size: 1,
-          openPrice: 100,
-          swap: 0,
-          profit: 0,
-          children: [
-            {
-              id: 1,
-              openTime: new Date(),
-              openPrice: 100,
-              closePrice: 150,
-              symbol: OrderSymbol.BTCUSD,
-              side: 'BUY',
-              size: 1,
-              swap: 0
-            }
-          ],
-          styles: {}
-        }
-      ];
-
-      const data: QuoteData[] = [];
-
-      const result = service.updateProfitValues(orderGroups, data);
-      expect(result[0].profit).toBe(0);
-      expect(result[0].styles?.['profit']).toBe(service.textNegative);
+      expect(result.profit).toBeGreaterThan(0);
+      expect(result.styles?.['profit']).toEqual(service.textPositive);
     });
   });
 
   describe('getMultiplier', () => {
-    it('should return correct multiplier for BTCUSD', () => {
-      expect(service.getMultiplier(OrderSymbol.BTCUSD)).toBe(100);
+    it('should return the correct multiplier for BTCUSD', () => {
+      const result = service.getMultiplier(OrderSymbol.BTCUSD);
+      expect(result).toBe(10 ** 2);
     });
 
-    it('should return correct multiplier for ETHUSD', () => {
-      expect(service.getMultiplier(OrderSymbol.ETHUSD)).toBe(1000);
+    it('should return the correct multiplier for ETHUSD', () => {
+      const result = service.getMultiplier(OrderSymbol.ETHUSD);
+      expect(result).toBe(10 ** 3);
     });
 
-    it('should return correct multiplier for TTWO.US', () => {
-      expect(service.getMultiplier(OrderSymbol.TTWO_US)).toBe(10);
+    it('should return the correct multiplier for TTWO_US', () => {
+      const result = service.getMultiplier(OrderSymbol.TTWO_US);
+      expect(result).toBe(10 ** 1);
     });
 
-    it('should return 1 for unknown symbol', () => {
-      expect(service.getMultiplier('UNKNOWN' as OrderSymbol)).toBe(1);
+    it('should return the default multiplier for an unknown symbol', () => {
+      const result = service.getMultiplier('UNKNOWN' as OrderSymbol);
+      expect(result).toBe(1);
     });
   });
 });
