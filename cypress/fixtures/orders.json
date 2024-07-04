@@ -1,0 +1,64 @@
+{
+  "data": [
+    {
+      "openTime": 1691678627000,
+      "openPrice": 29432.41,
+      "swap": -8907.58,
+      "closePrice": 62454.28,
+      "id": 1203384,
+      "symbol": "BTCUSD",
+      "side": "SELL",
+      "size": 0.05
+    },
+    {
+      "openTime": 1707919965000,
+      "openPrice": 51751.87,
+      "swap": -654.28,
+      "closePrice": 66277.7,
+      "id": 1226230,
+      "symbol": "BTCUSD",
+      "side": "BUY",
+      "size": 0.01
+    },
+    {
+      "openTime": 1708338630000,
+      "openPrice": 52250.79,
+      "swap": -608.0,
+      "closePrice": 65098.21,
+      "id": 1226240,
+      "symbol": "BTCUSD",
+      "side": "BUY",
+      "size": 0.01
+    },
+    {
+      "openTime": 1708441204000,
+      "openPrice": 2940.6,
+      "swap": -8731.06,
+      "closePrice": 3003.28,
+      "id": 1226254,
+      "symbol": "ETHUSD",
+      "side": "BUY",
+      "size": 0.03
+    },
+    {
+      "openTime": 1708441272000,
+      "openPrice": 2940.06,
+      "swap": -8731.06,
+      "closePrice": 3003.28,
+      "id": 1226256,
+      "symbol": "ETHUSD",
+      "side": "BUY",
+      "size": 0.03
+    },
+    {
+      "openTime": 1708444146000,
+      "openPrice": 151.59,
+      "swap": -118.79,
+      "closePrice": 144.06,
+      "id": 1226260,
+      "symbol": "TTWO.US",
+      "side": "BUY",
+      "size": 3.0
+    }
+  ]
+}
