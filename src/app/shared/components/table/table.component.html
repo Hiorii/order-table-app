@@ -15,7 +15,7 @@
         <span
           class="flex justify-center items-center bg-background text-text w-7 h-7 rounded-full">{{ group.children.length }}</span>
       </td>
-      <td *ngFor="let header of headers.slice(1)" class="w-full text-center font-bold truncate">
+      <td *ngFor="let header of headers?.slice(1)" class="w-full text-center font-bold truncate">
         <ng-container *ngIf="!header.isAction">
             <span [ngClass]="group.styles?.[header.id]">
               {{ group[header.id] | displayValue:header.id }}
@@ -32,7 +32,7 @@
     <ng-container *ngIf="expandedGroups.has(group.symbol)">
       <tr *ngFor="let item of group.children">
         <td></td>
-        <td *ngFor="let header of headers.slice(1)" class="text-center h-12 truncate">
+        <td *ngFor="let header of headers?.slice(1)" class="text-center h-12 truncate">
           <ng-container *ngIf="!header.isAction">
               <span [ngClass]="item.styles?.[header.id]">
                 {{ item[header.id] | displayValue:header.id }}

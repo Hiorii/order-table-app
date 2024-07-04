@@ -1,17 +1,24 @@
 <div class="h-full w-full flex items-center justify-center">
-  <app-table *ngIf="orderGroups?.length" [headers]="headers" [data]="orderGroups"></app-table>
-  <div *ngIf="!orderGroups?.length" class="flex flex-col justify-center items-center">
-    <app-empty class="mb-6">
-      <div icon>
-        <app-icon [name]="emptyData.icon" class="text-5xl text-yellow-500"></app-icon>
-      </div>
-      <div title>
-        <h3 class="mb-8 text-3xl font-bold text-text">{{ emptyData.title }}</h3>
-      </div>
-      <div details>
-        <span class="text-text">{{ emptyData.details }}</span>
-      </div>
-    </app-empty>
-    <button appButton [appButtonText]="buttonData.text" [appButtonIcon]="buttonData.icon"></button>
-  </div>
+  <ng-container *ngIf="orderGroups$ | async as orderGroups">
+    <ng-container *ngIf="orderGroups.length; else emptyState">
+      <app-table [headers]="headers$ | async" [data]="orderGroups"></app-table>
+    </ng-container>
+  </ng-container>
+  <ng-template #emptyState>
+    <div class="flex flex-col justify-center items-center">
+      <app-empty class="mb-6">
+        <div icon>
+          <app-icon [name]="emptyData.icon" class="text-5xl text-yellow-500"></app-icon>
+        </div>
+        <div title>
+          <h3 class="mb-8 text-3xl font-bold text-text">{{ emptyData.title }}</h3>
+        </div>
+        <div details>
+          <span class="text-text">{{ emptyData.details }}</span>
+        </div>
+      </app-empty>
+      <button appButton [appButtonText]="buttonData.text" [appButtonIcon]="buttonData.icon"
+              (click)="vm.loadOrders()"></button>
+    </div>
+  </ng-template>
 </div>

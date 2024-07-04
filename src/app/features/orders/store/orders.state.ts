@@ -1,6 +1,6 @@
 /* eslint max-classes-per-file: 0 */
 /* eslint max-lines: 0 */
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Action, Selector, State, StateContext} from '@ngxs/store';
 import {OrdersStateModel} from './orders.state.model';
 import {GetOrdersData} from './orders.actions';
@@ -18,9 +18,7 @@ const defaultState = {
 @State<OrdersStateModel>(defaultState)
 @Injectable()
 export class OrdersState {
-  constructor(
-    private apiService: ApiService) {
-  }
+  private apiService = inject(ApiService);
 
   @Selector()
   static ordersData(state: OrdersStateModel): OrderModel[] | null {

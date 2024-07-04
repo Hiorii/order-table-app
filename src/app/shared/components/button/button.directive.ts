@@ -5,6 +5,7 @@ import {
   ElementRef,
   EnvironmentInjector,
   HostBinding,
+  inject,
   Input,
   OnChanges,
   Renderer2,
@@ -24,14 +25,11 @@ export class ButtonDirective implements OnChanges {
     return 'rounded-2xl w-full h-full font-semibold pl-12 pr-12 bg-background text-text p-4 text-xl flex justify-center items-center';
   }
 
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private injector = inject(EnvironmentInjector);
   private iconComponentRef: ComponentRef<IconComponent>;
   private textNode: Text;
-
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-    private injector: EnvironmentInjector
-  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['appButtonIcon'] && this.appButtonIcon) {

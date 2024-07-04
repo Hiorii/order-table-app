@@ -13,9 +13,9 @@ import { MessageService } from 'primeng/api';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent<T extends BaseTableData> {
-  @Input({ required: true }) headers: TableHeader[] = [];
+  @Input({ required: true }) headers: TableHeader[] | null = [];
 
-  @Input() set data(value: TableData<T>[]) {
+  @Input() set data(value: TableData<T>[] | null) {
     if (!value) return;
     this._data = value;
     this._data.forEach((item) => {

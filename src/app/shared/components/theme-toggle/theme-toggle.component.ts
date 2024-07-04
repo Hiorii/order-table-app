@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ThemeService } from '../../../core/services/theme.service';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { Observable } from 'rxjs';
@@ -15,12 +15,11 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 export class ThemeToggleComponent implements OnInit {
   protected readonly faMoon = faMoon;
   protected readonly faSun = faSun;
+  private themeService = inject(ThemeService);
 
   darkMode$: Observable<boolean>;
   buttonText$: Observable<string>;
   buttonIcon$: Observable<IconDefinition>;
-
-  constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
     this.darkMode$ = this.themeService.darkMode$;
