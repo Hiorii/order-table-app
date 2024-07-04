@@ -18,8 +18,14 @@ module.exports = {
           hover: 'rgba(53, 71, 89, .5)',
           profitPositive: 'rgb(60, 193, 149)',
           profitNegative: 'rgb(249, 76, 76)'
-        }
+        },
+        'hover-background': 'var(--hover)'
       }
+    }
+  },
+  variants: {
+    extend: {
+      backgroundColor: ['hover']
     }
   },
   plugins: []
