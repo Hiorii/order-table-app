@@ -1,6 +1,5 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { BaseComponent } from '../../../../shared/components/base.component';
-import { filter, Observable, switchMap, takeUntil, throttleTime } from 'rxjs';
+import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { filter, Observable, switchMap, throttleTime } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { OrdersState } from '../../store/orders.state';
 import { OrderModel } from '../../../../core/models/order.model';
@@ -20,12 +19,13 @@ import { OrderItemsEnum } from '../../enums/order-items.enum';
 import { environment } from '../../../../../environments/environment';
 import { ProfitCalculationService } from '../../services/profit-calculation.service';
 import { MessageService } from 'primeng/api';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-orders-table',
   templateUrl: './orders-table.component.html'
 })
-export class OrdersTableComponent extends BaseComponent implements OnInit, OnDestroy {
+export class OrdersTableComponent implements OnInit, OnDestroy {
   ordersData$: Observable<OrderModel[] | null> = inject(Store).select(OrdersState.ordersData);
   ordersData: OrderModel[] | null = [];
   orderGroups: OrderGroup[] = [];
@@ -33,6 +33,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
   emptyData: EmptyOrderModel;
   buttonData: ButtonModel;
   symbols: string[] = [];
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private store: Store,
@@ -40,9 +41,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
     private confirmModalService: ConfirmModalService,
     private webSocketService: WebSocketService,
     private profitCalculationService: ProfitCalculationService
-  ) {
-    super();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.getOrdersData();
@@ -52,7 +51,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
     this.setupWebSocket();
   }
 
-  override ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.unsubscribeFromSymbols();
     this.webSocketService.disconnect();
   }
@@ -107,7 +106,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
   }
 
   listenToOrdersDataChanges(): void {
-    this.ordersData$.pipe(filter(Boolean), takeUntil(this.destroyed$)).subscribe((data) => {
+    this.ordersData$.pipe(filter(Boolean), takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
       this.ordersData = data;
       this.groupOrders();
     });
@@ -168,7 +167,7 @@ export class OrdersTableComponent extends BaseComponent implements OnInit, OnDes
           return this.webSocketService.getMessages();
         }),
         throttleTime(5000),
-        takeUntil(this.destroyed$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((message: QuotesSubscribedMessage) => {
         if (message.p === environment.webSockets.subscribeAddress) {
