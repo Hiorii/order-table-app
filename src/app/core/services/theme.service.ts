@@ -1,30 +1,32 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { DarkModeEnum } from '../enums/dark-mode.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  private darkMode: boolean;
+  private darkModeSubject = new BehaviorSubject<boolean>(this.getInitialTheme());
+  public darkMode$ = this.darkModeSubject.asObservable();
   private darkModeLocalStorageKey = 'darkMode';
 
   constructor() {
-    this.darkMode = this.getInitialTheme();
     this.updateBodyClass();
   }
 
   isDarkMode(): boolean {
-    return this.darkMode;
+    return this.darkModeSubject.value;
   }
 
   toggleTheme(): void {
-    this.darkMode = !this.darkMode;
-    localStorage.setItem(this.darkModeLocalStorageKey, this.darkMode.toString());
+    const newDarkMode = !this.isDarkMode();
+    this.darkModeSubject.next(newDarkMode);
+    localStorage.setItem(this.darkModeLocalStorageKey, newDarkMode.toString());
     this.updateBodyClass();
   }
 
   private updateBodyClass(): void {
-    if (this.darkMode) {
+    if (this.isDarkMode()) {
       document.body.classList.add(DarkModeEnum.dark);
       document.body.classList.remove(DarkModeEnum.light);
     } else {

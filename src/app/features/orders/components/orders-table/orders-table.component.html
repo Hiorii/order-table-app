@@ -3,6 +3,6 @@
   <div *ngIf="!orderGroups?.length" class="flex flex-col justify-center items-center">
     <app-empty [title]="emptyData.title" [details]="emptyData.details"
                [icon]="emptyData.icon" class="mb-8"></app-empty>
-    <app-button [text]="buttonData.text" [icon]="buttonData.icon" (clickBtn)="getOrdersData()"></app-button>
+    <button appButton [appButtonText]="buttonData.text" [appButtonIcon]="buttonData.icon"></button>
   </div>
 </div>

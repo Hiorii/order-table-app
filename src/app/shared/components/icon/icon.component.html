@@ -1,12 +1,10 @@
 <fa-icon
-  *ngIf="!fad"
+  *ngIf="!fad && name"
   [icon]="name"
-  [styles]="styles"
 ></fa-icon>
 
 <fa-duotone-icon
-  *ngIf="fad"
+  *ngIf="fad && name"
   [icon]="name"
-  [styles]="styles"
 >
 </fa-duotone-icon>
