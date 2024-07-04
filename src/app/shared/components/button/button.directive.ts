@@ -17,8 +17,8 @@ import { IconComponent } from '../icon/icon.component';
   selector: '[appButton]'
 })
 export class ButtonDirective implements OnChanges {
-  @Input() appButtonText: string;
-  @Input() appButtonIcon: IconDefinition | undefined;
+  @Input() appButtonText: string | null;
+  @Input() appButtonIcon: IconDefinition | undefined | null;
 
   @HostBinding('class') get classes(): string {
     return 'rounded-2xl w-full h-full font-semibold pl-12 pr-12 bg-background text-text p-4 text-xl flex justify-center items-center';
@@ -44,19 +44,19 @@ export class ButtonDirective implements OnChanges {
   }
 
   private updateIcon(): void {
+    if (!this.appButtonIcon) return;
     if (this.iconComponentRef) {
       this.renderer.removeChild(this.el.nativeElement, this.iconComponentRef.location.nativeElement);
       this.iconComponentRef.destroy();
     }
-    if (this.appButtonIcon) {
-      const iconComponentRef = this.createIconComponent();
-      this.renderer.addClass(iconComponentRef.location.nativeElement, 'mr-4');
-      this.renderer.insertBefore(this.el.nativeElement, iconComponentRef.location.nativeElement, this.el.nativeElement.firstChild);
-      this.iconComponentRef = iconComponentRef;
-    }
+    const iconComponentRef = this.createIconComponent();
+    this.renderer.addClass(iconComponentRef.location.nativeElement, 'mr-4');
+    this.renderer.insertBefore(this.el.nativeElement, iconComponentRef.location.nativeElement, this.el.nativeElement.firstChild);
+    this.iconComponentRef = iconComponentRef;
   }
 
   private updateText(): void {
+    if (!this.appButtonText) return;
     if (this.textNode) {
       this.renderer.removeChild(this.el.nativeElement, this.textNode);
     }

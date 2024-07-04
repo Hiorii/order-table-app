@@ -1,28 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ThemeService } from '../../../core/services/theme.service';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
   selector: 'app-theme-toggle',
   template: `
-    <button
-      appButton
-      [appButtonText]="(darkMode$ | async) ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-      [appButtonIcon]="(darkMode$ | async) ? faSun : faMoon"
-      (click)="toggleTheme()"
-    ></button>
-  `
+    <button appButton [appButtonText]="buttonText$ | async" [appButtonIcon]="buttonIcon$ | async" (click)="toggleTheme()"></button>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ThemeToggleComponent implements OnInit {
   protected readonly faMoon = faMoon;
   protected readonly faSun = faSun;
-  darkMode$: Observable<boolean>;
 
-  constructor(public themeService: ThemeService) {}
+  darkMode$: Observable<boolean>;
+  buttonText$: Observable<string>;
+  buttonIcon$: Observable<IconDefinition>;
+
+  constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
     this.darkMode$ = this.themeService.darkMode$;
+    this.buttonText$ = this.darkMode$.pipe(map((isDarkMode) => (isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode')));
+    this.buttonIcon$ = this.darkMode$.pipe(map((isDarkMode) => (isDarkMode ? this.faSun : this.faMoon)));
   }
 
   toggleTheme(): void {

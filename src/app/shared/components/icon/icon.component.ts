@@ -6,6 +6,6 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
   templateUrl: './icon.component.html'
 })
 export class IconComponent {
-  @Input({ required: true }) name: IconDefinition | undefined;
-  @Input() fad = false;
+  @Input({ required: true }) name: IconDefinition | undefined | null;
+  @Input() fad: boolean = false;
 }

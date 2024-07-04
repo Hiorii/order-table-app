@@ -1,6 +1,6 @@
 <div class="h-full w-full flex items-center justify-center">
   <app-table *ngIf="orderGroups?.length" [headers]="headers" [data]="orderGroups"></app-table>
-  <div *ngIf="orderGroups?.length" class="flex flex-col justify-center items-center">
+  <div *ngIf="!orderGroups?.length" class="flex flex-col justify-center items-center">
     <app-empty class="mb-6">
       <div icon>
         <app-icon [name]="emptyData.icon" class="text-5xl text-yellow-500"></app-icon>
