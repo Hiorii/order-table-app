@@ -25,6 +25,11 @@ Documentation: https://jestjs.io/docs/getting-started.
 
 Examples: https://www.xfive.co/blog/testing-angular-faster-jest/
 
+### Run full Ci functionality
+
+1. Run the command `npm run ci`.
+2. This command will start all functionalities connected with CI process (formatting, linting, testing, building).
+
 ## Running end-to-end tests
 
 ### Run tests
